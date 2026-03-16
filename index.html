@@ -18,7 +18,6 @@
 }
 body { font-family:var(--font); background:var(--bg-0); color:var(--text-1); min-height:100vh; font-size:14px; }
 ::-webkit-scrollbar{width:6px} ::-webkit-scrollbar-track{background:var(--bg-1)} ::-webkit-scrollbar-thumb{background:var(--blue-dim);border-radius:3px}
-
 .app { max-width:900px; margin:0 auto; padding:2rem 1.5rem 4rem; }
 
 /* HEADER */
@@ -72,6 +71,7 @@ body { font-family:var(--font); background:var(--bg-0); color:var(--text-1); min
 .person-tag { font-size:10px; font-family:var(--mono); padding:2px 7px; border-radius:var(--radius-sm); }
 .person-dev { background:rgba(59,130,246,.12); color:var(--blue-light); }
 .person-sup { background:rgba(52,211,153,.1); color:var(--green); }
+.dep-hu { display:flex; flex-wrap:wrap; gap:6px; margin-top:6px; }
 .dep-right { display:flex; align-items:center; gap:10px; flex-shrink:0; }
 .progress-wrap { display:flex; align-items:center; gap:8px; }
 .progress-track { width:90px; height:4px; background:var(--bg-4); border-radius:2px; overflow:hidden; }
@@ -106,6 +106,9 @@ body { font-family:var(--font); background:var(--bg-0); color:var(--text-1); min
 .task-link { display:inline-flex; align-items:center; gap:5px; margin-top:6px; font-size:11px; color:var(--blue-bright); text-decoration:none; font-family:var(--mono); }
 .task-link:hover { color:var(--blue-light); text-decoration:underline; }
 .task-audit { font-size:10px; color:var(--text-3); font-family:var(--mono); margin-top:5px; }
+.task-drag { color:var(--text-3); cursor:grab; font-size:14px; padding:2px 4px; flex-shrink:0; margin-top:2px; user-select:none; line-height:1; }
+.task-drag:active { cursor:grabbing; }
+.task-row.drag-over { border-top:2px solid var(--blue-bright); }
 .task-del-btn { background:none; border:none; color:var(--text-3); cursor:pointer; font-size:14px; padding:2px 5px; border-radius:var(--radius-sm); transition:color .15s; line-height:1; flex-shrink:0; margin-top:2px; }
 .task-del-btn:hover { color:var(--red); }
 .task-edit-btn { background:none; border:none; color:var(--text-3); cursor:pointer; font-size:13px; padding:2px 5px; border-radius:var(--radius-sm); transition:color .15s; line-height:1; flex-shrink:0; margin-top:2px; }
@@ -115,16 +118,6 @@ body { font-family:var(--font); background:var(--bg-0); color:var(--text-1); min
 .dep-edit-btn:hover { color:var(--blue-light); border-color:var(--border-hi); }
 .add-task-row { display:flex; align-items:center; gap:8px; padding:10px 18px; font-size:12px; color:var(--text-3); cursor:pointer; border:none; background:none; width:100%; text-align:left; font-family:var(--font); border-top:1px solid var(--border); transition:color .15s,background .15s; }
 .add-task-row:hover { color:var(--blue-light); background:rgba(37,99,235,.06); }
-
-/* TAG COLORS */
-.tag-release    { background:#1e3a5f; color:#7dd3fc; }
-.tag-elastic    { background:#2d1e5f; color:#c4b5fd; }
-.tag-s3         { background:#3b2e10; color:#fbbf24; }
-.tag-lambda     { background:#0f3327; color:#34d399; }
-.tag-cf         { background:#1a2e1a; color:#86efac; }
-.tag-db         { background:#1e1040; color:#a78bfa; }
-.tag-cloudfront { background:#3b1e10; color:#fb923c; }
-.tag-manual     { background:#1e2535; color:#94a3b8; }
 
 /* HISTORIAL */
 .hist-list { display:flex; flex-direction:column; gap:8px; }
@@ -176,7 +169,6 @@ body { font-family:var(--font); background:var(--bg-0); color:var(--text-1); min
 .toast { position:fixed; bottom:24px; right:24px; background:var(--bg-2); border:1px solid var(--border-hi); border-radius:var(--radius-md); padding:10px 16px; font-size:13px; color:var(--text-1); z-index:999; animation:tIn .2s ease; box-shadow:0 8px 24px rgba(0,0,0,.5); pointer-events:none; }
 .toast.err { border-color:rgba(248,113,113,.4); color:var(--red); }
 @keyframes tIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:none} }
-
 @media(max-width:600px){ .form-row{grid-template-columns:1fr} .dep-right .progress-wrap{display:none} }
 </style>
 </head>
@@ -198,6 +190,7 @@ body { font-family:var(--font); background:var(--bg-0); color:var(--text-1); min
           <div class="session-rol" id="sRolDisplay"></div>
         </div>
         <button class="btn-xs" onclick="openModal('modalSession')">cambiar</button>
+        <button class="btn-xs" style="color:var(--red);border-color:rgba(248,113,113,.3)" onclick="cerrarSesion()">salir</button>
       </div>
       <button class="btn-primary" id="btnNuevo" onclick="openNewDeployModal()" disabled>
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -206,7 +199,6 @@ body { font-family:var(--font); background:var(--bg-0); color:var(--text-1); min
     </div>
   </div>
 
-  <!-- CONFIGURACIÓN SUPABASE -->
   <div id="configBox" class="config-box" style="display:none">
     <p>⚙️ Configura tu conexión a Supabase. Encuentra estos valores en tu proyecto → <b>Settings → API</b>.</p>
     <label class="form-label">Project URL</label>
@@ -257,9 +249,7 @@ body { font-family:var(--font); background:var(--bg-0); color:var(--text-1); min
     </div>
     <div class="form-group" id="sNombreGroup" style="display:none">
       <label class="form-label">Tu nombre</label>
-      <select class="form-select" id="sNombre">
-        <option value="">— selecciona —</option>
-      </select>
+      <select class="form-select" id="sNombre"><option value="">— selecciona —</option></select>
     </div>
     <div class="modal-actions">
       <button class="btn-primary" style="width:100%" onclick="saveSession()">Entrar</button>
@@ -294,10 +284,12 @@ body { font-family:var(--font); background:var(--bg-0); color:var(--text-1); min
       </div>
       <div class="form-group">
         <label class="form-label">Persona de soporte</label>
-        <select class="form-select" id="ndSoporte">
-          <option value="">— sin asignar —</option>
-        </select>
+        <select class="form-select" id="ndSoporte"><option value="">— sin asignar —</option></select>
       </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Links de HU (uno por línea)</label>
+      <textarea class="form-textarea" id="ndHU" placeholder="https://jira.empresa.com/HU-123&#10;https://jira.empresa.com/HU-456"></textarea>
     </div>
     <div class="modal-actions">
       <button class="btn-ghost" onclick="closeModal('modalNewDeploy')">Cancelar</button>
@@ -313,9 +305,7 @@ body { font-family:var(--font); background:var(--bg-0); color:var(--text-1); min
     <div class="form-row">
       <div class="form-group">
         <label class="form-label">Tipo</label>
-        <select class="form-select" id="ntType" onchange="onTypeChange()">
-          <option value="">cargando...</option>
-        </select>
+        <select class="form-select" id="ntType" onchange="onTypeChange()"><option value="">cargando...</option></select>
       </div>
       <div class="form-group">
         <label class="form-label">Instancia / Ambiente</label>
@@ -328,7 +318,7 @@ body { font-family:var(--font); background:var(--bg-0); color:var(--text-1); min
     </div>
     <div class="form-group" id="grpLink">
       <label class="form-label">Link (opcional)</label>
-      <input class="form-input" id="ntLink" placeholder="https://console.aws.amazon.com/..." />
+      <textarea class="form-textarea" id="ntLink" placeholder="https://console.aws.amazon.com/...&#10;https://otro-link.com" style="min-height:60px"></textarea>
     </div>
     <div class="form-group" id="grpQuery" style="display:none">
       <label class="form-label">Query SQL</label>
@@ -354,21 +344,10 @@ body { font-family:var(--font); background:var(--bg-0); color:var(--text-1); min
 </div>
 
 <script>
-// ════════════════════════════════════
-// CONFIGURACIÓN — reemplaza con tus
-// credenciales de Supabase o déjalos
-// vacíos para ingresarlos en pantalla.
-// ════════════════════════════════════
-let SB_URL = 'https://dmhaecdarwaoarqsflsa.supabase.co';
-let SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRtaGFlY2Rhcndhb2FycXNmbHNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NzYzNTgsImV4cCI6MjA4OTI1MjM1OH0.1e4CweDx3OXPSUjFhOe8gMIIW0u3uF8oOCbnAAUZtyU';
-
-
-// ════════════════════════════════════
-// CATÁLOGOS (se cargan desde Supabase)
-// ════════════════════════════════════
-let CAT_INTEGRANTES = [];   // { id, nombre, rol, orden }
-let CAT_TIPOS = [];         // { id, clave, etiqueta, color_bg, color_texto, orden }
-
+let SB_URL = '';
+let SB_KEY = '';
+let CAT_INTEGRANTES = [];
+let CAT_TIPOS = [];
 let session = JSON.parse(localStorage.getItem('dt_session') || 'null');
 let cache = [];
 let _depEditing = null;
@@ -378,18 +357,12 @@ let _pickedRol  = '';
 let _editingDepId   = null;
 let _editingTaskId  = null;
 let _editingTaskDep = null;
+let _dragDepId  = null;
+let _dragTaskId = null;
 
-// ════════════════════════════════════
-// API HELPER
-// ════════════════════════════════════
 async function api(path, opts = {}) {
   const r = await fetch(SB_URL + '/rest/v1/' + path, {
-    headers: {
-      'apikey': SB_KEY,
-      'Authorization': 'Bearer ' + SB_KEY,
-      'Content-Type': 'application/json',
-      'Prefer': opts.prefer || 'return=representation',
-    },
+    headers: { 'apikey':SB_KEY, 'Authorization':'Bearer '+SB_KEY, 'Content-Type':'application/json', 'Prefer':opts.prefer||'return=representation' },
     method: opts.method || 'GET',
     body: opts.body !== undefined ? JSON.stringify(opts.body) : undefined
   });
@@ -398,110 +371,79 @@ async function api(path, opts = {}) {
   return t ? JSON.parse(t) : null;
 }
 
-// ════════════════════════════════════
-// CONFIG SUPABASE
-// ════════════════════════════════════
 function initConfig() {
-  // Intentar tomar desde variables hardcodeadas primero
   if (SB_URL && SB_KEY) { boot(); return; }
-  // Luego desde localStorage
   const saved = localStorage.getItem('dt_cfg');
-  if (saved) {
-    const c = JSON.parse(saved);
-    SB_URL = c.url; SB_KEY = c.key;
-    boot(); return;
-  }
-  // Mostrar caja de configuración
+  if (saved) { const c=JSON.parse(saved); SB_URL=c.url; SB_KEY=c.key; boot(); return; }
   document.getElementById('configBox').style.display = 'block';
 }
 
 function saveConfig() {
-  const url = document.getElementById('cfgUrl').value.trim().replace(/\/$/, '');
+  const url = document.getElementById('cfgUrl').value.trim().replace(/\/$/,'');
   const key = document.getElementById('cfgKey').value.trim();
-  if (!url || !key) { toast('Completa URL y Key', true); return; }
-  SB_URL = url; SB_KEY = key;
-  localStorage.setItem('dt_cfg', JSON.stringify({ url, key }));
-  document.getElementById('configBox').style.display = 'none';
+  if (!url||!key) { toast('Completa URL y Key',true); return; }
+  SB_URL=url; SB_KEY=key;
+  localStorage.setItem('dt_cfg', JSON.stringify({url,key}));
+  document.getElementById('configBox').style.display='none';
   boot();
 }
 
 async function boot() {
   try {
-    const [integrantes, tipos] = await Promise.all([
+    const [integrantes,tipos] = await Promise.all([
       api('integrantes?activo=eq.true&order=nombre.asc'),
       api('tipos_tarea?activo=eq.true&order=etiqueta.asc')
     ]);
-    CAT_INTEGRANTES = integrantes || [];
-    CAT_TIPOS       = tipos       || [];
+    CAT_INTEGRANTES = integrantes||[];
+    CAT_TIPOS = tipos||[];
     poblarTipos();
     poblarSelectSoporte();
-  } catch(e) {
-    toast('Error cargando catálogos: ' + e.message, true);
-  }
-  if (session) {
-    updateSessionUI();
-    closeModal('modalSession');
-    loadDeployments();
-  }
+  } catch(e) { toast('Error cargando catálogos: '+e.message,true); }
+  if (session) { updateSessionUI(); closeModal('modalSession'); loadDeployments(); }
 }
 
 function poblarTipos() {
-  const sel = document.getElementById('ntType');
-  sel.innerHTML = CAT_TIPOS.map(t =>
-    `<option value="${t.clave}">${t.etiqueta}</option>`
-  ).join('');
+  document.getElementById('ntType').innerHTML = CAT_TIPOS.map(t=>`<option value="${t.clave}">${t.etiqueta}</option>`).join('');
 }
-
 function poblarSelectSoporte() {
-  const soportes = CAT_INTEGRANTES.filter(i => i.rol === 'soporte');
-  const sel = document.getElementById('ndSoporte');
-  sel.innerHTML = '<option value="">— sin asignar —</option>' +
-    soportes.map(i => `<option value="${i.nombre}">${i.nombre}</option>`).join('');
+  const soportes = CAT_INTEGRANTES.filter(i=>i.rol==='soporte');
+  document.getElementById('ndSoporte').innerHTML = '<option value="">— sin asignar —</option>' +
+    soportes.map(i=>`<option value="${i.nombre}">${i.nombre}</option>`).join('');
 }
 
-// ════════════════════════════════════
-// SESIÓN
-// ════════════════════════════════════
 function pickRol(r) {
   _pickedRol = r;
-  document.getElementById('rcDev').classList.toggle('sel', r === 'desarrollador');
-  document.getElementById('rcSup').classList.toggle('sel', r === 'soporte');
-  // Filtrar integrantes por rol desde el catálogo
-  const personas = CAT_INTEGRANTES.filter(i => i.rol === r);
+  document.getElementById('rcDev').classList.toggle('sel', r==='desarrollador');
+  document.getElementById('rcSup').classList.toggle('sel', r==='soporte');
+  const personas = CAT_INTEGRANTES.filter(i=>i.rol===r);
   const sel = document.getElementById('sNombre');
   sel.innerHTML = '<option value="">— selecciona tu nombre —</option>' +
-    personas.map(i => `<option value="${i.nombre}"${session?.nombre===i.nombre?' selected':''}>${i.nombre}</option>`).join('');
+    personas.map(i=>`<option value="${i.nombre}"${session?.nombre===i.nombre?' selected':''}>${i.nombre}</option>`).join('');
   document.getElementById('sNombreGroup').style.display = 'block';
 }
 
 async function saveSession() {
   const nombre = document.getElementById('sNombre').value.trim();
-  if (!_pickedRol) { toast('Selecciona un rol', true); return; }
-  if (!nombre) { toast('Selecciona tu nombre', true); return; }
-  if (!SB_URL) { toast('Primero configura Supabase', true); return; }
+  if (!_pickedRol) { toast('Selecciona un rol',true); return; }
+  if (!nombre) { toast('Selecciona tu nombre',true); return; }
+  if (!SB_URL) { toast('Primero configura Supabase',true); return; }
   try {
-    // Buscar o crear usuario en la tabla usuarios
     let rows = await api(`usuarios?nombre=eq.${encodeURIComponent(nombre)}&rol=eq.${_pickedRol}`);
     let u;
-    if (rows && rows.length) {
+    if (rows&&rows.length) {
       u = rows[0];
-      // Actualizar último ingreso
-      await api(`usuarios?id=eq.${u.id}`, {
-        method: 'PATCH', prefer: 'return=minimal',
-        body: { ultimo_ingreso: new Date().toISOString() }
-      });
+      await api(`usuarios?id=eq.${u.id}`,{method:'PATCH',prefer:'return=minimal',body:{ultimo_ingreso:new Date().toISOString()}});
     } else {
-      const r = await api('usuarios', { method:'POST', body:{ nombre, rol:_pickedRol, ultimo_ingreso: new Date().toISOString() } });
+      const r = await api('usuarios',{method:'POST',body:{nombre,rol:_pickedRol,ultimo_ingreso:new Date().toISOString()}});
       u = r[0];
     }
-    session = { id:u.id, nombre, rol:_pickedRol };
-    localStorage.setItem('dt_session', JSON.stringify(session));
-    // Registrar el ingreso en historial
-    await audit('sesion', u.id, 'ingreso', { nombre, rol: _pickedRol });
+    session = {id:u.id,nombre,rol:_pickedRol};
+    localStorage.setItem('dt_session',JSON.stringify(session));
+    await audit('sesion',u.id,'ingreso',{nombre,rol:_pickedRol});
     closeModal('modalSession');
     updateSessionUI();
     loadDeployments();
-  } catch(e) { toast('Error: ' + e.message, true); }
+  } catch(e) { toast('Error: '+e.message,true); }
 }
 
 function updateSessionUI() {
@@ -510,64 +452,74 @@ function updateSessionUI() {
   document.getElementById('sRolDisplay').textContent = session.rol;
   document.getElementById('mainTabs').style.display = 'flex';
   document.getElementById('btnNuevo').disabled = session.rol !== 'desarrollador';
-  // Pre-seleccionar en modal al reabrir
   pickRol(session.rol);
 }
 
-// ════════════════════════════════════
-// CARGAR DESPLIEGUES
-// ════════════════════════════════════
+function cerrarSesion() {
+  session = null;
+  localStorage.removeItem('dt_session');
+  document.getElementById('sessionPill').style.display = 'none';
+  document.getElementById('mainTabs').style.display = 'none';
+  document.getElementById('btnNuevo').disabled = true;
+  document.getElementById('depList').innerHTML = '';
+  document.getElementById('histList').innerHTML = '';
+  hide('emptyD'); hide('emptyH');
+  _pickedRol = '';
+  document.getElementById('rcDev').classList.remove('sel');
+  document.getElementById('rcSup').classList.remove('sel');
+  document.getElementById('sNombreGroup').style.display = 'none';
+  document.getElementById('sNombre').innerHTML = '';
+  openModal('modalSession');
+}
+
 async function loadDeployments() {
   show('loadingD'); hide('emptyD');
   document.getElementById('depList').innerHTML = '';
   try {
-    const deps = await api('despliegues?order=created_at.desc&select=*,dev:usuarios!despliegues_desarrollador_id_fkey(nombre),sup:usuarios!despliegues_soporte_id_fkey(nombre)');
+    const deps  = await api('despliegues?order=created_at.desc&select=*,dev:usuarios!despliegues_desarrollador_id_fkey(nombre),sup:usuarios!despliegues_soporte_id_fkey(nombre)');
     const tasks = await api('tareas?order=orden.asc,created_at.asc&select=*,cmp_u:usuarios!tareas_completada_por_fkey(nombre),del_u:usuarios!tareas_eliminada_por_fkey(nombre)');
-    cache = (deps||[]).map(d => ({ ...d, open:false, tasks:(tasks||[]).filter(t=>t.despliegue_id===d.id) }));
+    cache = (deps||[]).map(d=>({...d,open:false,tasks:(tasks||[]).filter(t=>t.despliegue_id===d.id)}));
     hide('loadingD');
     renderDeployments();
-  } catch(e) { hide('loadingD'); toast('Error: ' + e.message, true); }
+  } catch(e) { hide('loadingD'); toast('Error: '+e.message,true); }
 }
 
-// ════════════════════════════════════
-// RENDER
-// ════════════════════════════════════
 function tipoInfo(clave) {
-  const t = CAT_TIPOS.find(x => x.clave === clave);
-  return t
-    ? { etiqueta: t.etiqueta, bg: t.color_bg, color: t.color_texto }
-    : { etiqueta: clave, bg: '#1e2535', color: '#94a3b8' };
+  const t = CAT_TIPOS.find(x=>x.clave===clave);
+  return t ? {etiqueta:t.etiqueta,bg:t.color_bg,color:t.color_texto} : {etiqueta:clave,bg:'#1e2535',color:'#94a3b8'};
 }
 
 function renderDeployments() {
   const el = document.getElementById('depList');
   if (!cache.length) { el.innerHTML=''; show('emptyD'); return; }
   hide('emptyD');
-  const isSup = session?.rol === 'soporte';
-  const isDev = session?.rol === 'desarrollador';
+  const isSup = session?.rol==='soporte';
+  const isDev = session?.rol==='desarrollador';
 
   el.innerHTML = cache.map(d => {
     const active = d.tasks.filter(t=>!t.eliminada);
     const done   = active.filter(t=>t.completada).length;
     const total  = active.length;
     const pct    = total ? Math.round(done/total*100) : 0;
-    const st = total===0?'pending': done===total?'done':'progress';
+    const st = total===0?'pending':done===total?'done':'progress';
     const stL = {pending:'pendiente',progress:'en progreso',done:'completado'};
     const stC = {pending:'badge-pending',progress:'badge-progress',done:'badge-done'};
-    const ds = d.fecha ? new Date(d.fecha+'T12:00:00').toLocaleDateString('es-CO',{timeZone: 'America/Bogota', day:'2-digit',month:'short',year:'numeric'}) : '';
+    const ds = d.fecha ? new Date(d.fecha+'T12:00:00').toLocaleDateString('es-CO',{timeZone:'America/Bogota',day:'2-digit',month:'short',year:'numeric'}) : '';
 
     const tasksHtml = d.tasks.map(t => {
       const isDel  = t.eliminada;
       const isDone = t.completada && !isDel;
-      const cAt = t.completada_at ? new Date(t.completada_at).toLocaleString('es-CO',{timeZone: 'America/Bogota', day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}) : '';
+      const cAt = t.completada_at ? new Date(t.completada_at).toLocaleString('es-CO',{timeZone:'America/Bogota',day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}) : '';
       const canCheck = isSup && !isDel;
-      return `<div class="task-row${isDone?' done':''}${isDel?' deleted':''}">
+      return `<div class="task-row${isDone?' done':''}${isDel?' deleted':''}"
+        ${isDev&&!isDel?`draggable="true" ondragstart="dragStart(event,'${d.id}','${t.id}')" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dragDrop(event,'${d.id}','${t.id}')"`:''}>
+        ${isDev&&!isDel?`<span class="task-drag" title="Arrastrar para reordenar">⠿</span>`:''}
         <div class="task-checkbox${isDone?' checked':''}${!canCheck?' off':''}" onclick="${canCheck?`toggleTask('${d.id}','${t.id}')`:''}" style="${!canCheck?'cursor:default':''}"></div>
         <div class="task-content">
           <span class="task-tag" style="background:${tipoInfo(t.tipo).bg};color:${tipoInfo(t.tipo).color}">${tipoInfo(t.tipo).etiqueta}${t.ambiente?' · '+t.ambiente:''}</span>
           <div class="task-desc${isDone?' done-txt':''}${isDel?' del-txt':''}">${esc(t.descripcion)}</div>
           ${t.query_sql?`<div class="task-query">${esc(t.query_sql)}</div>`:''}
-          ${t.link?`<a class="task-link" href="${t.link}" target="_blank">↗ abrir enlace</a>`:''}
+          ${t.link?t.link.split('\n').filter(Boolean).map(l=>`<a class="task-link" href="${l.trim()}" target="_blank">↗ ${l.trim()}</a>`).join(''):''}
           ${isDone&&t.cmp_u?`<div class="task-audit">✓ completada por <b style="color:var(--green)">${esc(t.cmp_u.nombre)}</b>${cAt?' · '+cAt:''}</div>`:''}
           ${isDel&&t.del_u?`<div class="task-audit" style="color:var(--red)">✕ eliminada por <b>${esc(t.del_u.nombre)}</b></div>`:''}
         </div>
@@ -577,6 +529,8 @@ function renderDeployments() {
         </div>`:''}
       </div>`;
     }).join('');
+
+    const huLinks = d.hu_links ? d.hu_links.split('\n').filter(Boolean).map(l=>`<a class="task-link" href="${l.trim()}" target="_blank">↗ ${l.trim()}</a>`).join('') : '';
 
     return `<div class="deployment-card">
       <div class="dep-header" onclick="toggleDep('${d.id}')">
@@ -589,6 +543,7 @@ function renderDeployments() {
               <span class="person-tag person-dev">dev: ${esc(d.dev?.nombre||'—')}</span>
               <span class="person-tag person-sup">soporte: ${esc(d.sup?.nombre||'—')}</span>
             </div>
+            ${huLinks?`<div class="dep-hu">${huLinks}</div>`:''}
           </div>
         </div>
         <div class="dep-right">
@@ -610,29 +565,25 @@ function renderDeployments() {
   }).join('');
 }
 
-// ════════════════════════════════════
-// ACCIONES
-// ════════════════════════════════════
 function toggleDep(id) {
   const d = cache.find(x=>x.id===id);
   if (d) { d.open=!d.open; renderDeployments(); }
 }
 
 async function toggleTask(depId, taskId) {
-  if (!session || session.rol!=='soporte') return;
+  if (!session||session.rol!=='soporte') return;
   const d = cache.find(x=>x.id===depId);
   const t = d?.tasks.find(x=>x.id===taskId);
   if (!t) return;
   const nv = !t.completada;
   try {
-    await api(`tareas?id=eq.${taskId}`, { method:'PATCH', prefer:'return=minimal', body:{ completada:nv, completada_por:nv?session.id:null, completada_at:nv?new Date().toISOString():null } });
-    await audit('tarea', taskId, nv?'completar':'descompletar', { descripcion:t.descripcion, despliegue:d.nombre });
+    await api(`tareas?id=eq.${taskId}`,{method:'PATCH',prefer:'return=minimal',body:{completada:nv,completada_por:nv?session.id:null,completada_at:nv?new Date().toISOString():null}});
+    await audit('tarea',taskId,nv?'completar':'descompletar',{descripcion:t.descripcion,despliegue:d.nombre});
     t.completada=nv; t.cmp_u=nv?{nombre:session.nombre}:null; t.completada_at=nv?new Date().toISOString():null;
     renderDeployments();
-  } catch(e) { toast('Error: '+e.message, true); }
+  } catch(e) { toast('Error: '+e.message,true); }
 }
 
-// ── NUEVO / EDITAR DESPLIEGUE ──
 function openNewDeployModal() {
   if (session?.rol!=='desarrollador') return;
   _editingDepId = null;
@@ -640,7 +591,8 @@ function openNewDeployModal() {
   document.getElementById('ndModalTitle').textContent = 'Nuevo despliegue';
   document.getElementById('btnSaveDep').textContent = 'Crear';
   document.getElementById('ndDate').value = new Date().toISOString().split('T')[0];
-  ['ndName','ndProject','ndSoporte'].forEach(id=>document.getElementById(id).value='');
+  ['ndName','ndProject','ndHU'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('ndSoporte').value = '';
   document.getElementById('ndEnv').value = 'producción';
   openModal('modalNewDeploy');
 }
@@ -657,9 +609,8 @@ function openEditDeploy(depId) {
   document.getElementById('ndDate').value    = d.fecha  || '';
   document.getElementById('ndProject').value = d.proyecto || '';
   document.getElementById('ndEnv').value     = d.ambiente || 'producción';
-  // Seleccionar soporte en el select
-  const supSel = document.getElementById('ndSoporte');
-  supSel.value = d.sup?.nombre || '';
+  document.getElementById('ndSoporte').value = d.sup?.nombre || '';
+  document.getElementById('ndHU').value      = d.hu_links || '';
   openModal('modalNewDeploy');
 }
 
@@ -667,7 +618,8 @@ async function saveNewDeploy() {
   const nombre   = document.getElementById('ndName').value.trim();
   const proyecto = document.getElementById('ndProject').value.trim();
   const soporte  = document.getElementById('ndSoporte').value.trim();
-  if (!nombre) { toast('El nombre es requerido', true); return; }
+  const hu_links = document.getElementById('ndHU').value.trim();
+  if (!nombre) { toast('El nombre es requerido',true); return; }
   const btn = document.getElementById('btnSaveDep');
   btn.disabled = true;
   try {
@@ -677,25 +629,21 @@ async function saveNewDeploy() {
       if (rows?.length) { supId=rows[0].id; }
       else { const r=await api('usuarios',{method:'POST',body:{nombre:soporte,rol:'soporte'}}); supId=r[0].id; }
     }
-    const body = { nombre, fecha:document.getElementById('ndDate').value, ambiente:document.getElementById('ndEnv').value, proyecto, soporte_id:supId };
-
+    const body = {nombre,fecha:document.getElementById('ndDate').value,ambiente:document.getElementById('ndEnv').value,proyecto,soporte_id:supId,hu_links};
     if (_editingDepId) {
-      // EDITAR
-      await api(`despliegues?id=eq.${_editingDepId}`,{method:'PATCH',prefer:'return=minimal',body:{...body, updated_at:new Date().toISOString()}});
-      await audit('despliegue', _editingDepId, 'editar', { nombre, proyecto });
+      await api(`despliegues?id=eq.${_editingDepId}`,{method:'PATCH',prefer:'return=minimal',body:{...body,updated_at:new Date().toISOString()}});
+      await audit('despliegue',_editingDepId,'editar',{nombre,proyecto});
       closeModal('modalNewDeploy'); toast('Despliegue actualizado');
     } else {
-      // CREAR
-      const dep = await api('despliegues',{method:'POST',body:{...body, desarrollador_id:session.id}});
-      await audit('despliegue', dep[0].id, 'crear', { nombre, proyecto });
+      const dep = await api('despliegues',{method:'POST',body:{...body,desarrollador_id:session.id}});
+      await audit('despliegue',dep[0].id,'crear',{nombre,proyecto});
       closeModal('modalNewDeploy'); toast('Despliegue creado');
     }
     await loadDeployments();
-  } catch(e) { toast('Error: '+e.message, true); }
+  } catch(e) { toast('Error: '+e.message,true); }
   finally { btn.disabled=false; }
 }
 
-// ── NUEVA / EDITAR TAREA ──
 function openNewTask(depId) {
   if (session?.rol!=='desarrollador') return;
   _depEditing = depId;
@@ -703,7 +651,7 @@ function openNewTask(depId) {
   document.getElementById('ntModalTitle').textContent = 'Nueva tarea';
   document.getElementById('btnSaveTask').textContent = 'Agregar tarea';
   ['ntDesc','ntEnv','ntLink','ntQuery'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('ntType').value='release';
+  if (CAT_TIPOS.length) document.getElementById('ntType').value = CAT_TIPOS[0].clave;
   onTypeChange();
   openModal('modalNewTask');
 }
@@ -713,12 +661,10 @@ function openEditTask(depId, taskId) {
   const d = cache.find(x=>x.id===depId);
   const t = d?.tasks.find(x=>x.id===taskId);
   if (!t) return;
-  _depEditing = depId;
-  _editingTaskId  = taskId;
-  _editingTaskDep = depId;
+  _depEditing = depId; _editingTaskId = taskId; _editingTaskDep = depId;
   document.getElementById('ntModalTitle').textContent = 'Editar tarea';
   document.getElementById('btnSaveTask').textContent = 'Guardar cambios';
-  document.getElementById('ntType').value  = t.tipo || 'manual';
+  document.getElementById('ntType').value  = t.tipo || '';
   document.getElementById('ntEnv').value   = t.ambiente || '';
   document.getElementById('ntDesc').value  = t.descripcion || '';
   document.getElementById('ntLink').value  = t.link || '';
@@ -735,35 +681,26 @@ function onTypeChange() {
 
 async function saveTask() {
   const desc = document.getElementById('ntDesc').value.trim();
-  if (!desc) { toast('La descripción es requerida', true); return; }
+  if (!desc) { toast('La descripción es requerida',true); return; }
   const d = cache.find(x=>x.id===_depEditing);
-  const body = {
-    tipo:      document.getElementById('ntType').value,
-    ambiente:  document.getElementById('ntEnv').value.trim(),
-    descripcion: desc,
-    link:      document.getElementById('ntLink').value.trim(),
-    query_sql: document.getElementById('ntQuery').value.trim()
-  };
+  const body = {tipo:document.getElementById('ntType').value,ambiente:document.getElementById('ntEnv').value.trim(),descripcion:desc,link:document.getElementById('ntLink').value.trim(),query_sql:document.getElementById('ntQuery').value.trim()};
   try {
     if (_editingTaskId) {
-      // EDITAR
       await api(`tareas?id=eq.${_editingTaskId}`,{method:'PATCH',prefer:'return=minimal',body});
-      await audit('tarea', _editingTaskId, 'editar', { descripcion:desc, despliegue:d?.nombre });
+      await audit('tarea',_editingTaskId,'editar',{descripcion:desc,despliegue:d?.nombre});
       closeModal('modalNewTask'); toast('Tarea actualizada');
     } else {
-      // CREAR
-      const t = await api('tareas',{method:'POST',body:{...body, despliegue_id:_depEditing, orden:d?d.tasks.length:0}});
-      await audit('tarea', t[0].id, 'crear', { descripcion:desc, despliegue:d?.nombre });
+      const t = await api('tareas',{method:'POST',body:{...body,despliegue_id:_depEditing,orden:d?d.tasks.length:0}});
+      await audit('tarea',t[0].id,'crear',{descripcion:desc,despliegue:d?.nombre});
       closeModal('modalNewTask'); toast('Tarea agregada');
     }
     await loadDeployments();
     const dep = cache.find(x=>x.id===_depEditing);
     if (dep) dep.open=true;
     renderDeployments();
-  } catch(e) { toast('Error: '+e.message, true); }
+  } catch(e) { toast('Error: '+e.message,true); }
 }
 
-// ── ELIMINAR TAREA ──
 function askDel(depId, taskId) { _taskDelDep=depId; _taskDelId=taskId; openModal('modalDel'); }
 
 async function confirmDelete() {
@@ -771,21 +708,18 @@ async function confirmDelete() {
   const d = cache.find(x=>x.id===_taskDelDep);
   const t = d?.tasks.find(x=>x.id===_taskDelId);
   try {
-    await api(`tareas?id=eq.${_taskDelId}`,{method:'PATCH',prefer:'return=minimal',body:{ eliminada:true, eliminada_por:session.id, eliminada_at:new Date().toISOString() }});
-    await audit('tarea', _taskDelId, 'eliminar', { descripcion:t?.descripcion, despliegue:d?.nombre });
+    await api(`tareas?id=eq.${_taskDelId}`,{method:'PATCH',prefer:'return=minimal',body:{eliminada:true,eliminada_por:session.id,eliminada_at:new Date().toISOString()}});
+    await audit('tarea',_taskDelId,'eliminar',{descripcion:t?.descripcion,despliegue:d?.nombre});
     closeModal('modalDel'); toast('Tarea marcada como eliminada');
     await loadDeployments();
     const dep = cache.find(x=>x.id===_taskDelDep);
     if (dep) dep.open=true;
     renderDeployments();
-  } catch(e) { toast('Error: '+e.message, true); }
+  } catch(e) { toast('Error: '+e.message,true); }
 }
 
-// ════════════════════════════════════
-// HISTORIAL
-// ════════════════════════════════════
 async function audit(entidad, id, accion, detalle) {
-  try { await api('historial',{method:'POST',prefer:'return=minimal',body:{ entidad, entidad_id:id, accion, usuario_id:session?.id, detalle }}); } catch(e){}
+  try { await api('historial',{method:'POST',prefer:'return=minimal',body:{entidad,entidad_id:id,accion,usuario_id:session?.id,detalle}}); } catch(e){}
 }
 
 async function loadHistorial() {
@@ -795,23 +729,23 @@ async function loadHistorial() {
     const h = await api('historial?order=created_at.desc&limit=150&select=*,u:usuarios(nombre)');
     hide('loadingH');
     if (!h?.length) { show('emptyH'); return; }
-    const icons  = { crear:'＋', completar:'✓', descompletar:'↩', eliminar:'✕', editar:'✎', ingreso:'⏎' };
-    const cls    = { crear:'hi-crear', completar:'hi-completar', descompletar:'hi-descompletar', eliminar:'hi-eliminar', editar:'hi-editar', ingreso:'hi-ingreso' };
-    const verbos = { crear:'creó', completar:'completó tarea', descompletar:'desmarcó tarea', eliminar:'eliminó', editar:'editó', ingreso:'ingresó a la app' };
+    const icons  = {crear:'＋',completar:'✓',descompletar:'↩',eliminar:'✕',editar:'✎',ingreso:'⏎'};
+    const cls    = {crear:'hi-crear',completar:'hi-completar',descompletar:'hi-descompletar',eliminar:'hi-eliminar',editar:'hi-editar',ingreso:'hi-ingreso'};
+    const verbos = {crear:'creó',completar:'completó tarea',descompletar:'desmarcó tarea',eliminar:'eliminó',editar:'editó'};
     document.getElementById('histList').innerHTML = h.map(r => {
       const det = r.detalle||{};
       const who = r.u?.nombre||'?';
-      const accion = r.accion || '';
+      const accion = r.accion||'';
       let titleHtml;
-      if (accion === 'ingreso') {
-        const rolLabel = det.rol === 'desarrollador' ? 'como desarrollador' : 'como soporte';
+      if (accion==='ingreso') {
+        const rolLabel = det.rol==='desarrollador'?'como desarrollador':'como soporte';
         titleHtml = `<b>${esc(who)}</b> ingresó a la app <span style="color:var(--text-3)">${rolLabel}</span>`;
       } else {
         const what = det.nombre||det.descripcion||r.entidad_id;
         titleHtml = `<b>${esc(who)}</b> ${verbos[accion]||accion} ${r.entidad}: "${esc(what)}"`;
       }
-      const sub = det.despliegue ? `despliegue: ${det.despliegue}` : '';
-      const ts = new Date(r.created_at).toLocaleString('es-CO',{timeZone: 'America/Bogota', day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+      const sub = det.despliegue?`despliegue: ${det.despliegue}`:'';
+      const ts = new Date(r.created_at).toLocaleString('es-CO',{timeZone:'America/Bogota',day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
       return `<div class="hist-card">
         <div class="hist-icon ${cls[accion]||'hi-editar'}">${icons[accion]||'·'}</div>
         <div class="hist-body">
@@ -821,12 +755,9 @@ async function loadHistorial() {
         <div class="hist-time">${ts}</div>
       </div>`;
     }).join('');
-  } catch(e) { hide('loadingH'); toast('Error historial: '+e.message, true); }
+  } catch(e) { hide('loadingH'); toast('Error historial: '+e.message,true); }
 }
 
-// ════════════════════════════════════
-// TABS
-// ════════════════════════════════════
 function switchTab(tab) {
   document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',(i===0&&tab==='despliegues')||(i===1&&tab==='historial')));
   document.getElementById('viewDespliegues').style.display = tab==='despliegues'?'block':'none';
@@ -834,9 +765,33 @@ function switchTab(tab) {
   if (tab==='historial') loadHistorial();
 }
 
-// ════════════════════════════════════
-// UTILS
-// ════════════════════════════════════
+function dragStart(e, depId, taskId) { _dragDepId=depId; _dragTaskId=taskId; e.dataTransfer.effectAllowed='move'; }
+function dragOver(e) { e.preventDefault(); e.currentTarget.classList.add('drag-over'); }
+function dragLeave(e) { e.currentTarget.classList.remove('drag-over'); }
+async function dragDrop(e, targetDepId, targetTaskId) {
+  e.preventDefault();
+  e.currentTarget.classList.remove('drag-over');
+  if (_dragTaskId===targetTaskId||_dragDepId!==targetDepId) return;
+  const d = cache.find(x=>x.id===targetDepId);
+  if (!d) return;
+  const tasks = d.tasks.filter(t=>!t.eliminada);
+  const fromIdx = tasks.findIndex(t=>t.id===_dragTaskId);
+  const toIdx   = tasks.findIndex(t=>t.id===targetTaskId);
+  if (fromIdx===-1||toIdx===-1) return;
+  const [moved] = tasks.splice(fromIdx,1);
+  tasks.splice(toIdx,0,moved);
+  const deleted = d.tasks.filter(t=>t.eliminada);
+  d.tasks = [...tasks,...deleted];
+  renderDeployments();
+  const dep = cache.find(x=>x.id===targetDepId);
+  if (dep) dep.open=true;
+  renderDeployments();
+  try {
+    await Promise.all(tasks.map((t,i)=>api(`tareas?id=eq.${t.id}`,{method:'PATCH',prefer:'return=minimal',body:{orden:i}})));
+    toast('Orden guardado');
+  } catch(err) { toast('Error guardando orden: '+err.message,true); }
+}
+
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function show(id){ document.getElementById(id).style.display='block'; }
 function hide(id){ document.getElementById(id).style.display='none'; }
@@ -852,7 +807,6 @@ function toast(msg,err=false){
   document.body.appendChild(t); _tt=setTimeout(()=>t.remove(),3200);
 }
 
-// INICIO
 initConfig();
 </script>
 </body>
