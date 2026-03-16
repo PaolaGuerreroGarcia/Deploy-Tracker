@@ -169,7 +169,21 @@ body { font-family:var(--font); background:var(--bg-0); color:var(--text-1); min
 .toast { position:fixed; bottom:24px; right:24px; background:var(--bg-2); border:1px solid var(--border-hi); border-radius:var(--radius-md); padding:10px 16px; font-size:13px; color:var(--text-1); z-index:999; animation:tIn .2s ease; box-shadow:0 8px 24px rgba(0,0,0,.5); pointer-events:none; }
 .toast.err { border-color:rgba(248,113,113,.4); color:var(--red); }
 @keyframes tIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:none} }
-@media(max-width:600px){ .form-row{grid-template-columns:1fr} .dep-right .progress-wrap{display:none} }
+@media(max-width:600px){
+  .form-row { grid-template-columns:1fr; }
+  .app { padding:1rem 0.75rem 3rem; }
+  .dep-header { padding:12px 14px; gap:8px; }
+  .dep-left { gap:8px; }
+  .dep-date { font-size:10px; padding:2px 6px; }
+  .dep-name { font-size:13px; }
+  .dep-right { width:100%; justify-content:space-between; }
+  .dep-right .progress-wrap { display:flex; flex:1; }
+  .dep-right .progress-track { flex:1; width:auto; }
+  .dep-edit-btn { display:none; }
+  .task-row { padding:10px 14px; gap:8px; }
+  .tasks-header-label { padding:7px 14px 5px; }
+  .add-task-row { padding:10px 14px; }
+}
 </style>
 </head>
 <body>
