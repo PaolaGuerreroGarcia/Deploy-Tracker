@@ -182,7 +182,6 @@ body { font-family:var(--font); background:var(--bg-0); color:var(--text-1); min
 .toast { position:fixed; bottom:24px; right:24px; background:var(--bg-2); border:1px solid var(--border-hi); border-radius:var(--radius-md); padding:10px 16px; font-size:13px; color:var(--text-1); z-index:999; animation:tIn .2s ease; box-shadow:0 8px 24px rgba(0,0,0,.5); pointer-events:none; }
 .toast.err { border-color:rgba(248,113,113,.4); color:var(--red); }
 @keyframes tIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:none} }
-
 @media(max-width:600px){
   .form-row { grid-template-columns:1fr; }
   .app { padding:1rem 0.75rem 3rem; }
@@ -202,7 +201,6 @@ body { font-family:var(--font); background:var(--bg-0); color:var(--text-1); min
 </head>
 <body>
 <div class="app">
-
   <div class="header">
     <div class="logo">
       <div class="logo-icon"><svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
@@ -255,7 +253,6 @@ body { font-family:var(--font); background:var(--bg-0); color:var(--text-1); min
     <div class="hist-list" id="histList"></div>
     <div class="empty-state" id="emptyH" style="display:none"><p>// sin registros aún.</p></div>
   </div>
-
 </div>
 
 <!-- MODAL: Sesión -->
@@ -424,12 +421,7 @@ let _commentDepId   = null;
 async function api(path, opts = {}) {
   const base = SB_URL.replace(/\/$/,'');
   const r = await fetch(base + '/rest/v1/' + path, {
-    headers: {
-      'apikey': SB_KEY,
-      'Authorization': 'Bearer ' + SB_KEY,
-      'Content-Type': 'application/json',
-      'Prefer': opts.prefer || 'return=representation'
-    },
+    headers: { 'apikey':SB_KEY, 'Authorization':'Bearer '+SB_KEY, 'Content-Type':'application/json', 'Prefer':opts.prefer||'return=representation' },
     method: opts.method || 'GET',
     body: opts.body !== undefined ? JSON.stringify(opts.body) : undefined
   });
@@ -508,13 +500,10 @@ async function saveSession() {
   if (!password)   { errEl.textContent='Ingresa tu contraseña'; return; }
   if (!SB_URL)     { errEl.textContent='Primero configura Supabase'; return; }
   try {
-    // Verificar contraseña contra tabla integrantes
     const rows = await api(`integrantes?nombre=eq.${encodeURIComponent(nombre)}&rol=eq.${_pickedRol}&activo=eq.true`);
     if (!rows||!rows.length) throw new Error('Usuario no encontrado');
-    if (!rows[0].password) throw new Error('Este usuario no tiene contraseña configurada. Contacta al administrador.');
+    if (!rows[0].password) throw new Error('Sin contraseña configurada. Contacta al administrador.');
     if (rows[0].password !== password) throw new Error('Contraseña incorrecta');
-
-    // Buscar o crear en tabla usuarios
     let uRows = await api(`usuarios?nombre=eq.${encodeURIComponent(nombre)}&rol=eq.${_pickedRol}`);
     let u;
     if (uRows&&uRows.length) {
@@ -530,9 +519,7 @@ async function saveSession() {
     closeModal('modalSession');
     updateSessionUI();
     loadDeployments();
-  } catch(e) {
-    errEl.textContent = e.message;
-  }
+  } catch(e) { errEl.textContent = e.message; }
 }
 
 function updateSessionUI() {
@@ -541,6 +528,7 @@ function updateSessionUI() {
   document.getElementById('sRolDisplay').textContent = session.rol;
   document.getElementById('mainTabs').style.display = 'flex';
   document.getElementById('btnNuevo').disabled = session.rol !== 'desarrollador';
+  // Historial solo visible para desarrolladores
   document.getElementById('tabHistorial').style.display = session.rol === 'desarrollador' ? '' : 'none';
   pickRol(session.rol);
 }
@@ -610,14 +598,17 @@ function renderDeployments() {
     const stL = {pending:'pendiente',progress:'en progreso',done:'completado'};
     const stC = {pending:'badge-pending',progress:'badge-progress',done:'badge-done'};
     const ds = d.fecha ? new Date(d.fecha+'T12:00:00').toLocaleDateString('es-CO',{timeZone:'America/Bogota',day:'2-digit',month:'short',year:'numeric'}) : '';
+    // Solo el creador del despliegue puede editarlo
+    const canEditDep = isDev && d.creado_por === session.id;
 
     const tasksHtml = d.tasks.map(t => {
-      const isDel   = t.eliminada;
-      const isDone  = t.completada && !isDel;
+      const isDel  = t.eliminada;
+      const isDone = t.completada && !isDel;
       const cAt = t.completada_at ? new Date(t.completada_at).toLocaleString('es-CO',{timeZone:'America/Bogota',day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}) : '';
       const canCheck = isSup && !isDel;
+      // Solo el creador de la tarea puede editarla/eliminarla/arrastrarla
+      const canEditTask = isDev && !isDel && t.creado_por === session.id;
 
-      // Comentarios
       const commentsHtml = (t.comments||[]).map(c => {
         const cTs = new Date(c.created_at).toLocaleString('es-CO',{timeZone:'America/Bogota',day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
         const initials = (c.u?.nombre||'?').split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
@@ -635,8 +626,8 @@ function renderDeployments() {
       const descPreview = t.descripcion.substring(0,60);
 
       return `<div class="task-row${isDone?' done':''}${isDel?' deleted':''}"
-        ${isDev&&!isDel?`draggable="true" ondragstart="dragStart(event,'${d.id}','${t.id}')" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dragDrop(event,'${d.id}','${t.id}')"`:''}>
-        ${isDev&&!isDel?`<span class="task-drag" title="Arrastrar para reordenar">⠿</span>`:''}
+        ${canEditTask?`draggable="true" ondragstart="dragStart(event,'${d.id}','${t.id}')" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dragDrop(event,'${d.id}','${t.id}')"`:''}>
+        ${canEditTask?`<span class="task-drag" title="Arrastrar para reordenar">⠿</span>`:''}
         <div class="task-checkbox${isDone?' checked':''}${!canCheck?' off':''}" onclick="${canCheck?`toggleTask('${d.id}','${t.id}')`:''}" style="${!canCheck?'cursor:default':''}"></div>
         <div class="task-content">
           <span class="task-tag" style="background:${tipoInfo(t.tipo).bg};color:${tipoInfo(t.tipo).color}">${tipoInfo(t.tipo).etiqueta}${t.ambiente?' · '+esc(t.ambiente):''}</span>
@@ -650,7 +641,7 @@ function renderDeployments() {
             ${isSup&&!isDel?`<button class="btn-comment" onclick="openComment('${d.id}','${t.id}','${esc(descPreview)}')">+ comentario</button>`:''}
           </div>`:''}
         </div>
-        ${isDev&&!isDel?`<div class="task-actions">
+        ${canEditTask?`<div class="task-actions">
           <button class="task-edit-btn" onclick="openEditTask('${d.id}','${t.id}')" title="Editar">✎</button>
           <button class="task-del-btn" onclick="askDel('${d.id}','${t.id}')" title="Eliminar">✕</button>
         </div>`:''}
@@ -679,7 +670,7 @@ function renderDeployments() {
             <span class="progress-pct">${pct}%</span>
           </div>
           <span class="status-badge ${stC[st]}">${stL[st]}</span>
-          ${isDev?`<button class="dep-edit-btn" onclick="event.stopPropagation();openEditDeploy('${d.id}')" title="Editar despliegue">✎ editar</button>`:''}
+          ${canEditDep?`<button class="dep-edit-btn" onclick="event.stopPropagation();openEditDeploy('${d.id}')" title="Editar despliegue">✎ editar</button>`:''}
           <span class="chevron${d.open?' open':''}">▶</span>
         </div>
       </div>
@@ -731,7 +722,7 @@ function openNewDeployModal() {
 function openEditDeploy(depId) {
   if (session?.rol!=='desarrollador') return;
   const d = cache.find(x=>x.id===depId);
-  if (!d) return;
+  if (!d||d.creado_por!==session.id) { toast('Solo el creador puede editar este despliegue',true); return; }
   _editingDepId = depId;
   document.getElementById('ndModalIcon').textContent = '✎';
   document.getElementById('ndModalTitle').textContent = 'Editar despliegue';
@@ -766,7 +757,7 @@ async function saveNewDeploy() {
       await audit('despliegue',_editingDepId,'editar',{nombre,proyecto});
       closeModal('modalNewDeploy'); toast('Despliegue actualizado');
     } else {
-      const dep = await api('despliegues',{method:'POST',body:{...body,desarrollador_id:session.id}});
+      const dep = await api('despliegues',{method:'POST',body:{...body,desarrollador_id:session.id,creado_por:session.id}});
       await audit('despliegue',dep[0].id,'crear',{nombre,proyecto});
       closeModal('modalNewDeploy'); toast('Despliegue creado');
     }
@@ -792,7 +783,7 @@ function openEditTask(depId, taskId) {
   if (session?.rol!=='desarrollador') return;
   const d = cache.find(x=>x.id===depId);
   const t = d?.tasks.find(x=>x.id===taskId);
-  if (!t) return;
+  if (!t||t.creado_por!==session.id) { toast('Solo el creador puede editar esta tarea',true); return; }
   _depEditing = depId; _editingTaskId = taskId; _editingTaskDep = depId;
   document.getElementById('ntModalTitle').textContent = 'Editar tarea';
   document.getElementById('btnSaveTask').textContent = 'Guardar cambios';
@@ -828,7 +819,7 @@ async function saveTask() {
       await audit('tarea',_editingTaskId,'editar',{descripcion:desc,despliegue:d?.nombre});
       closeModal('modalNewTask'); toast('Tarea actualizada');
     } else {
-      const t = await api('tareas',{method:'POST',body:{...body,despliegue_id:_depEditing,orden:d?d.tasks.length:0}});
+      const t = await api('tareas',{method:'POST',body:{...body,despliegue_id:_depEditing,orden:d?d.tasks.length:0,creado_por:session.id}});
       await audit('tarea',t[0].id,'crear',{descripcion:desc,despliegue:d?.nombre});
       closeModal('modalNewTask'); toast('Tarea agregada');
     }
@@ -846,6 +837,7 @@ async function confirmDelete() {
   if (!_taskDelId) return;
   const d = cache.find(x=>x.id===_taskDelDep);
   const t = d?.tasks.find(x=>x.id===_taskDelId);
+  if (t?.creado_por!==session.id) { toast('Solo el creador puede eliminar esta tarea',true); closeModal('modalDel'); return; }
   try {
     await api(`tareas?id=eq.${_taskDelId}`,{method:'PATCH',prefer:'return=minimal',body:{eliminada:true,eliminada_por:session.id,eliminada_at:new Date().toISOString()}});
     await audit('tarea',_taskDelId,'eliminar',{descripcion:t?.descripcion,despliegue:d?.nombre});
@@ -860,8 +852,7 @@ async function confirmDelete() {
 // ── COMENTARIOS ──
 function openComment(depId, taskId, descPreview) {
   if (session?.rol!=='soporte') { toast('Solo soporte puede comentar',true); return; }
-  _commentTaskId = taskId;
-  _commentDepId  = depId;
+  _commentTaskId = taskId; _commentDepId = depId;
   document.getElementById('commentText').value = '';
   document.getElementById('commentTaskDesc').textContent = descPreview + (descPreview.length>=60?'...':'');
   openModal('modalComment');
@@ -901,8 +892,8 @@ async function loadHistorial() {
     const cls    = {crear:'hi-crear',completar:'hi-completar',descompletar:'hi-descompletar',eliminar:'hi-eliminar',editar:'hi-editar',ingreso:'hi-ingreso',comentar:'hi-comentar'};
     const verbos = {crear:'creó',completar:'completó tarea',descompletar:'desmarcó tarea',eliminar:'eliminó',editar:'editó',comentar:'comentó en'};
     document.getElementById('histList').innerHTML = h.map(r => {
-      const det    = r.detalle||{};
-      const who    = r.u?.nombre||'?';
+      const det = r.detalle||{};
+      const who = r.u?.nombre||'?';
       const accion = r.accion||'';
       let titleHtml;
       if (accion==='ingreso') {
@@ -975,7 +966,7 @@ function show(id){ document.getElementById(id).style.display='block'; }
 function hide(id){ document.getElementById(id).style.display='none'; }
 function openModal(id){ document.getElementById(id).classList.add('open'); }
 function closeModal(id){ document.getElementById(id).classList.remove('open'); }
-document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.modal-backdrop.open').forEach(m=>m.classList.remove('open'));});
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') document.querySelectorAll('.modal-backdrop.open:not(#modalSession)').forEach(m=>m.classList.remove('open')); });
 
 let _tt;
 function toast(msg,err=false){
