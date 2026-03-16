@@ -238,7 +238,7 @@ body { font-family:var(--font); background:var(--bg-0); color:var(--text-1); min
 
   <div class="tabs" id="mainTabs" style="display:none">
     <button class="tab active" onclick="switchTab('despliegues')">despliegues</button>
-    <button class="tab" onclick="switchTab('historial')">historial</button>
+    <button class="tab" id="tabHistorial" onclick="switchTab('historial')">historial</button>
   </div>
 
   <div id="viewDespliegues">
@@ -541,6 +541,7 @@ function updateSessionUI() {
   document.getElementById('sRolDisplay').textContent = session.rol;
   document.getElementById('mainTabs').style.display = 'flex';
   document.getElementById('btnNuevo').disabled = session.rol !== 'desarrollador';
+  document.getElementById('tabHistorial').style.display = session.rol === 'desarrollador' ? '' : 'none';
   pickRol(session.rol);
 }
 
@@ -974,7 +975,6 @@ function show(id){ document.getElementById(id).style.display='block'; }
 function hide(id){ document.getElementById(id).style.display='none'; }
 function openModal(id){ document.getElementById(id).classList.add('open'); }
 function closeModal(id){ document.getElementById(id).classList.remove('open'); }
-document.querySelectorAll('.modal-backdrop').forEach(b=>b.addEventListener('click',e=>{if(e.target===b)b.classList.remove('open');}));
 document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.modal-backdrop.open').forEach(m=>m.classList.remove('open'));});
 
 let _tt;
