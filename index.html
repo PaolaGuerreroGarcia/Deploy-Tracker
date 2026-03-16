@@ -99,7 +99,7 @@ body { font-family:var(--font); background:var(--bg-0); color:var(--text-1); min
 .task-checkbox.off { cursor:not-allowed; opacity:.4; pointer-events:none; }
 .task-content { flex:1; min-width:0; }
 .task-tag { display:inline-block; font-size:10px; font-weight:500; padding:2px 7px; border-radius:var(--radius-sm); font-family:var(--mono); margin-bottom:5px; }
-.task-desc { font-size:13px; color:var(--text-1); line-height:1.5; white-space: pre-wrap; }
+.task-desc { font-size:13px; color:var(--text-1); line-height:1.5; white-space:pre-wrap; }
 .task-desc.done-txt { text-decoration:line-through; color:var(--text-3); }
 .task-desc.del-txt { text-decoration:line-through; color:var(--red); }
 .task-query { margin-top:8px; background:var(--bg-0); border:1px solid var(--border); border-radius:var(--radius-sm); padding:8px 10px; font-family:var(--mono); font-size:11px; color:#86efac; white-space:pre-wrap; word-break:break-all; line-height:1.6; }
@@ -119,16 +119,28 @@ body { font-family:var(--font); background:var(--bg-0); color:var(--text-1); min
 .add-task-row { display:flex; align-items:center; gap:8px; padding:10px 18px; font-size:12px; color:var(--text-3); cursor:pointer; border:none; background:none; width:100%; text-align:left; font-family:var(--font); border-top:1px solid var(--border); transition:color .15s,background .15s; }
 .add-task-row:hover { color:var(--blue-light); background:rgba(37,99,235,.06); }
 
+/* COMENTARIOS */
+.task-comments { margin-top:10px; border-top:1px solid var(--border); padding-top:8px; }
+.comment-item { display:flex; gap:8px; margin-bottom:8px; }
+.comment-avatar { width:22px; height:22px; border-radius:50%; background:var(--bg-4); display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:500; color:var(--blue-light); flex-shrink:0; margin-top:1px; }
+.comment-body { flex:1; }
+.comment-author { font-size:10px; color:var(--blue-light); font-family:var(--mono); font-weight:500; }
+.comment-time { font-size:10px; color:var(--text-3); font-family:var(--mono); margin-left:6px; }
+.comment-text { font-size:12px; color:var(--text-2); line-height:1.5; margin-top:2px; white-space:pre-wrap; }
+.btn-comment { background:none; border:1px solid var(--border); color:var(--text-3); cursor:pointer; font-size:10px; padding:2px 8px; border-radius:var(--radius-sm); font-family:var(--mono); transition:all .15s; margin-top:6px; }
+.btn-comment:hover { color:var(--amber); border-color:rgba(251,191,36,.3); }
+
 /* HISTORIAL */
 .hist-list { display:flex; flex-direction:column; gap:8px; }
 .hist-card { background:var(--bg-1); border:1px solid var(--border); border-radius:var(--radius-md); padding:12px 16px; display:flex; align-items:flex-start; gap:12px; }
 .hist-icon { width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; flex-shrink:0; }
-.hi-crear      { background:rgba(59,130,246,.15); color:var(--blue-light); }
-.hi-completar  { background:rgba(52,211,153,.12); color:var(--green); }
-.hi-descompletar { background:rgba(251,191,36,.1); color:var(--amber); }
-.hi-eliminar   { background:rgba(248,113,113,.12); color:var(--red); }
-.hi-editar     { background:rgba(148,163,184,.1); color:var(--text-2); }
-.hi-ingreso    { background:rgba(99,102,241,.15); color:#a5b4fc; }
+.hi-crear        { background:rgba(59,130,246,.15); color:var(--blue-light); }
+.hi-completar    { background:rgba(52,211,153,.12); color:var(--green); }
+.hi-descompletar { background:rgba(251,191,36,.1);  color:var(--amber); }
+.hi-eliminar     { background:rgba(248,113,113,.12); color:var(--red); }
+.hi-editar       { background:rgba(148,163,184,.1);  color:var(--text-2); }
+.hi-ingreso      { background:rgba(99,102,241,.15);  color:#a5b4fc; }
+.hi-comentar     { background:rgba(251,191,36,.1);   color:var(--amber); }
 .hist-body { flex:1; }
 .hist-title { font-size:13px; color:var(--text-1); line-height:1.5; }
 .hist-title b { color:var(--blue-light); font-weight:500; }
@@ -161,6 +173,7 @@ body { font-family:var(--font); background:var(--bg-0); color:var(--text-1); min
 .rol-card.sel { border-color:var(--blue-mid); background:rgba(37,99,235,.15); }
 .rol-card-title { font-size:13px; font-weight:500; }
 .rol-card-sub { font-size:11px; color:var(--text-3); font-family:var(--mono); margin-top:3px; }
+.session-error { font-size:11px; color:var(--red); font-family:var(--mono); margin-top:6px; min-height:14px; text-align:center; }
 
 /* UTILS */
 .empty-state { text-align:center; padding:4rem 2rem; color:var(--text-3); border:1px dashed var(--border); border-radius:var(--radius-lg); }
@@ -169,6 +182,7 @@ body { font-family:var(--font); background:var(--bg-0); color:var(--text-1); min
 .toast { position:fixed; bottom:24px; right:24px; background:var(--bg-2); border:1px solid var(--border-hi); border-radius:var(--radius-md); padding:10px 16px; font-size:13px; color:var(--text-1); z-index:999; animation:tIn .2s ease; box-shadow:0 8px 24px rgba(0,0,0,.5); pointer-events:none; }
 .toast.err { border-color:rgba(248,113,113,.4); color:var(--red); }
 @keyframes tIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:none} }
+
 @media(max-width:600px){
   .form-row { grid-template-columns:1fr; }
   .app { padding:1rem 0.75rem 3rem; }
@@ -265,6 +279,11 @@ body { font-family:var(--font); background:var(--bg-0); color:var(--text-1); min
       <label class="form-label">Tu nombre</label>
       <select class="form-select" id="sNombre"><option value="">— selecciona —</option></select>
     </div>
+    <div class="form-group" id="sPasswordGroup" style="display:none">
+      <label class="form-label">Contraseña</label>
+      <input class="form-input" type="password" id="sPassword" placeholder="••••••••" onkeydown="if(event.key==='Enter')saveSession()" />
+    </div>
+    <div class="session-error" id="sError"></div>
     <div class="modal-actions">
       <button class="btn-primary" style="width:100%" onclick="saveSession()">Entrar</button>
     </div>
@@ -303,7 +322,7 @@ body { font-family:var(--font); background:var(--bg-0); color:var(--text-1); min
     </div>
     <div class="form-group">
       <label class="form-label">Links de HU (uno por línea)</label>
-      <textarea class="form-textarea" id="ndHU" placeholder="https://jira.empresa.com/HU-123&#10;https://jira.empresa.com/HU-456"></textarea>
+      <textarea class="form-textarea" id="ndHU" placeholder="https://jira.empresa.com/HU-123&#10;https://jira.empresa.com/HU-456" style="min-height:60px"></textarea>
     </div>
     <div class="modal-actions">
       <button class="btn-ghost" onclick="closeModal('modalNewDeploy')">Cancelar</button>
@@ -357,26 +376,60 @@ body { font-family:var(--font); background:var(--bg-0); color:var(--text-1); min
   </div>
 </div>
 
+<!-- MODAL: Comentario -->
+<div class="modal-backdrop" id="modalComment">
+  <div class="modal modal-sm">
+    <div class="modal-title"><span class="accent">💬</span> Agregar comentario</div>
+    <p style="color:var(--text-2);font-size:12px;font-family:var(--mono);margin-bottom:14px;line-height:1.5" id="commentTaskDesc"></p>
+    <div class="form-group">
+      <label class="form-label">Comentario</label>
+      <textarea class="form-textarea" id="commentText" placeholder="Ej: El servidor no respondió, se reintentará mañana..."></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-ghost" onclick="closeModal('modalComment')">Cancelar</button>
+      <button class="btn-primary" onclick="saveComment()">Guardar</button>
+    </div>
+  </div>
+</div>
+
 <script>
+// ════════════════════════════════════
+// CONFIGURACIÓN SUPABASE
+// ════════════════════════════════════
 let SB_URL = 'https://dmhaecdarwaoarqsflsa.supabase.co/';
 let SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRtaGFlY2Rhcndhb2FycXNmbHNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NzYzNTgsImV4cCI6MjA4OTI1MjM1OH0.1e4CweDx3OXPSUjFhOe8gMIIW0u3uF8oOCbnAAUZtyU';
+
+// ════════════════════════════════════
+// ESTADO
+// ════════════════════════════════════
 let CAT_INTEGRANTES = [];
 let CAT_TIPOS = [];
 let session = JSON.parse(localStorage.getItem('dt_session') || 'null');
 let cache = [];
-let _depEditing = null;
-let _taskDelDep = null;
-let _taskDelId  = null;
-let _pickedRol  = '';
+let _depEditing     = null;
+let _taskDelDep     = null;
+let _taskDelId      = null;
+let _pickedRol      = '';
 let _editingDepId   = null;
 let _editingTaskId  = null;
 let _editingTaskDep = null;
-let _dragDepId  = null;
-let _dragTaskId = null;
+let _dragDepId      = null;
+let _dragTaskId     = null;
+let _commentTaskId  = null;
+let _commentDepId   = null;
 
+// ════════════════════════════════════
+// API HELPER
+// ════════════════════════════════════
 async function api(path, opts = {}) {
-  const r = await fetch(SB_URL + '/rest/v1/' + path, {
-    headers: { 'apikey':SB_KEY, 'Authorization':'Bearer '+SB_KEY, 'Content-Type':'application/json', 'Prefer':opts.prefer||'return=representation' },
+  const base = SB_URL.replace(/\/$/,'');
+  const r = await fetch(base + '/rest/v1/' + path, {
+    headers: {
+      'apikey': SB_KEY,
+      'Authorization': 'Bearer ' + SB_KEY,
+      'Content-Type': 'application/json',
+      'Prefer': opts.prefer || 'return=representation'
+    },
     method: opts.method || 'GET',
     body: opts.body !== undefined ? JSON.stringify(opts.body) : undefined
   });
@@ -385,6 +438,9 @@ async function api(path, opts = {}) {
   return t ? JSON.parse(t) : null;
 }
 
+// ════════════════════════════════════
+// CONFIG SUPABASE
+// ════════════════════════════════════
 function initConfig() {
   if (SB_URL && SB_KEY) { boot(); return; }
   const saved = localStorage.getItem('dt_cfg');
@@ -425,6 +481,9 @@ function poblarSelectSoporte() {
     soportes.map(i=>`<option value="${i.nombre}">${i.nombre}</option>`).join('');
 }
 
+// ════════════════════════════════════
+// SESIÓN CON CONTRASEÑA
+// ════════════════════════════════════
 function pickRol(r) {
   _pickedRol = r;
   document.getElementById('rcDev').classList.toggle('sel', r==='desarrollador');
@@ -434,30 +493,46 @@ function pickRol(r) {
   sel.innerHTML = '<option value="">— selecciona tu nombre —</option>' +
     personas.map(i=>`<option value="${i.nombre}"${session?.nombre===i.nombre?' selected':''}>${i.nombre}</option>`).join('');
   document.getElementById('sNombreGroup').style.display = 'block';
+  document.getElementById('sPasswordGroup').style.display = 'block';
+  document.getElementById('sPassword').value = '';
+  document.getElementById('sError').textContent = '';
 }
 
 async function saveSession() {
-  const nombre = document.getElementById('sNombre').value.trim();
-  if (!_pickedRol) { toast('Selecciona un rol',true); return; }
-  if (!nombre) { toast('Selecciona tu nombre',true); return; }
-  if (!SB_URL) { toast('Primero configura Supabase',true); return; }
+  const nombre   = document.getElementById('sNombre').value.trim();
+  const password = document.getElementById('sPassword').value;
+  const errEl    = document.getElementById('sError');
+  errEl.textContent = '';
+  if (!_pickedRol) { errEl.textContent='Selecciona un rol'; return; }
+  if (!nombre)     { errEl.textContent='Selecciona tu nombre'; return; }
+  if (!password)   { errEl.textContent='Ingresa tu contraseña'; return; }
+  if (!SB_URL)     { errEl.textContent='Primero configura Supabase'; return; }
   try {
-    let rows = await api(`usuarios?nombre=eq.${encodeURIComponent(nombre)}&rol=eq.${_pickedRol}`);
+    // Verificar contraseña contra tabla integrantes
+    const rows = await api(`integrantes?nombre=eq.${encodeURIComponent(nombre)}&rol=eq.${_pickedRol}&activo=eq.true`);
+    if (!rows||!rows.length) throw new Error('Usuario no encontrado');
+    if (!rows[0].password) throw new Error('Este usuario no tiene contraseña configurada. Contacta al administrador.');
+    if (rows[0].password !== password) throw new Error('Contraseña incorrecta');
+
+    // Buscar o crear en tabla usuarios
+    let uRows = await api(`usuarios?nombre=eq.${encodeURIComponent(nombre)}&rol=eq.${_pickedRol}`);
     let u;
-    if (rows&&rows.length) {
-      u = rows[0];
+    if (uRows&&uRows.length) {
+      u = uRows[0];
       await api(`usuarios?id=eq.${u.id}`,{method:'PATCH',prefer:'return=minimal',body:{ultimo_ingreso:new Date().toISOString()}});
     } else {
-      const r = await api('usuarios',{method:'POST',body:{nombre,rol:_pickedRol,ultimo_ingreso:new Date().toISOString()}});
-      u = r[0];
+      const resp = await api('usuarios',{method:'POST',body:{nombre,rol:_pickedRol,ultimo_ingreso:new Date().toISOString()}});
+      u = resp[0];
     }
-    session = {id:u.id,nombre,rol:_pickedRol};
-    localStorage.setItem('dt_session',JSON.stringify(session));
-    await audit('sesion',u.id,'ingreso',{nombre,rol:_pickedRol});
+    session = {id:u.id, nombre, rol:_pickedRol};
+    localStorage.setItem('dt_session', JSON.stringify(session));
+    await audit('sesion', u.id, 'ingreso', {nombre, rol:_pickedRol});
     closeModal('modalSession');
     updateSessionUI();
     loadDeployments();
-  } catch(e) { toast('Error: '+e.message,true); }
+  } catch(e) {
+    errEl.textContent = e.message;
+  }
 }
 
 function updateSessionUI() {
@@ -482,22 +557,37 @@ function cerrarSesion() {
   document.getElementById('rcDev').classList.remove('sel');
   document.getElementById('rcSup').classList.remove('sel');
   document.getElementById('sNombreGroup').style.display = 'none';
+  document.getElementById('sPasswordGroup').style.display = 'none';
   document.getElementById('sNombre').innerHTML = '';
+  document.getElementById('sPassword').value = '';
+  document.getElementById('sError').textContent = '';
   openModal('modalSession');
 }
 
+// ════════════════════════════════════
+// CARGAR DESPLIEGUES
+// ════════════════════════════════════
 async function loadDeployments() {
   show('loadingD'); hide('emptyD');
   document.getElementById('depList').innerHTML = '';
   try {
-    const deps  = await api('despliegues?order=created_at.desc&select=*,dev:usuarios!despliegues_desarrollador_id_fkey(nombre),sup:usuarios!despliegues_soporte_id_fkey(nombre)');
-    const tasks = await api('tareas?order=orden.asc,created_at.asc&select=*,cmp_u:usuarios!tareas_completada_por_fkey(nombre),del_u:usuarios!tareas_eliminada_por_fkey(nombre)');
-    cache = (deps||[]).map(d=>({...d,open:false,tasks:(tasks||[]).filter(t=>t.despliegue_id===d.id)}));
+    const deps     = await api('despliegues?order=created_at.desc&select=*,dev:usuarios!despliegues_desarrollador_id_fkey(nombre),sup:usuarios!despliegues_soporte_id_fkey(nombre)');
+    const tasks    = await api('tareas?order=orden.asc,created_at.asc&select=*,cmp_u:usuarios!tareas_completada_por_fkey(nombre),del_u:usuarios!tareas_eliminada_por_fkey(nombre)');
+    const comments = await api('comentarios?order=created_at.asc&select=*,u:usuarios(nombre)');
+    cache = (deps||[]).map(d=>({
+      ...d, open:false,
+      tasks:(tasks||[]).filter(t=>t.despliegue_id===d.id).map(t=>({
+        ...t, comments:(comments||[]).filter(c=>c.tarea_id===t.id)
+      }))
+    }));
     hide('loadingD');
     renderDeployments();
   } catch(e) { hide('loadingD'); toast('Error: '+e.message,true); }
 }
 
+// ════════════════════════════════════
+// RENDER
+// ════════════════════════════════════
 function tipoInfo(clave) {
   const t = CAT_TIPOS.find(x=>x.clave===clave);
   return t ? {etiqueta:t.etiqueta,bg:t.color_bg,color:t.color_texto} : {etiqueta:clave,bg:'#1e2535',color:'#94a3b8'};
@@ -521,21 +611,43 @@ function renderDeployments() {
     const ds = d.fecha ? new Date(d.fecha+'T12:00:00').toLocaleDateString('es-CO',{timeZone:'America/Bogota',day:'2-digit',month:'short',year:'numeric'}) : '';
 
     const tasksHtml = d.tasks.map(t => {
-      const isDel  = t.eliminada;
-      const isDone = t.completada && !isDel;
+      const isDel   = t.eliminada;
+      const isDone  = t.completada && !isDel;
       const cAt = t.completada_at ? new Date(t.completada_at).toLocaleString('es-CO',{timeZone:'America/Bogota',day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}) : '';
       const canCheck = isSup && !isDel;
+
+      // Comentarios
+      const commentsHtml = (t.comments||[]).map(c => {
+        const cTs = new Date(c.created_at).toLocaleString('es-CO',{timeZone:'America/Bogota',day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+        const initials = (c.u?.nombre||'?').split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+        return `<div class="comment-item">
+          <div class="comment-avatar">${initials}</div>
+          <div class="comment-body">
+            <span class="comment-author">${esc(c.u?.nombre||'?')}</span>
+            <span class="comment-time">${cTs}</span>
+            <div class="comment-text">${esc(c.texto)}</div>
+          </div>
+        </div>`;
+      }).join('');
+
+      const showCommentSection = (t.comments&&t.comments.length>0) || isSup;
+      const descPreview = t.descripcion.substring(0,60);
+
       return `<div class="task-row${isDone?' done':''}${isDel?' deleted':''}"
         ${isDev&&!isDel?`draggable="true" ondragstart="dragStart(event,'${d.id}','${t.id}')" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dragDrop(event,'${d.id}','${t.id}')"`:''}>
         ${isDev&&!isDel?`<span class="task-drag" title="Arrastrar para reordenar">⠿</span>`:''}
         <div class="task-checkbox${isDone?' checked':''}${!canCheck?' off':''}" onclick="${canCheck?`toggleTask('${d.id}','${t.id}')`:''}" style="${!canCheck?'cursor:default':''}"></div>
         <div class="task-content">
-          <span class="task-tag" style="background:${tipoInfo(t.tipo).bg};color:${tipoInfo(t.tipo).color}">${tipoInfo(t.tipo).etiqueta}${t.ambiente?' · '+t.ambiente:''}</span>
+          <span class="task-tag" style="background:${tipoInfo(t.tipo).bg};color:${tipoInfo(t.tipo).color}">${tipoInfo(t.tipo).etiqueta}${t.ambiente?' · '+esc(t.ambiente):''}</span>
           <div class="task-desc${isDone?' done-txt':''}${isDel?' del-txt':''}">${esc(t.descripcion)}</div>
           ${t.query_sql?`<div class="task-query">${esc(t.query_sql)}</div>`:''}
-          ${t.link?t.link.split('\n').filter(Boolean).map(l=>`<a class="task-link" href="${l.trim()}" target="_blank">↗ ${l.trim()}</a>`).join(''):''}
+          ${t.link?t.link.split('\n').filter(Boolean).map(l=>`<a class="task-link" href="${l.trim()}" target="_blank">↗ ${esc(l.trim())}</a>`).join(''):''}
           ${isDone&&t.cmp_u?`<div class="task-audit">✓ completada por <b style="color:var(--green)">${esc(t.cmp_u.nombre)}</b>${cAt?' · '+cAt:''}</div>`:''}
           ${isDel&&t.del_u?`<div class="task-audit" style="color:var(--red)">✕ eliminada por <b>${esc(t.del_u.nombre)}</b></div>`:''}
+          ${showCommentSection?`<div class="task-comments">
+            ${commentsHtml}
+            ${isSup&&!isDel?`<button class="btn-comment" onclick="openComment('${d.id}','${t.id}','${esc(descPreview)}')">+ comentario</button>`:''}
+          </div>`:''}
         </div>
         ${isDev&&!isDel?`<div class="task-actions">
           <button class="task-edit-btn" onclick="openEditTask('${d.id}','${t.id}')" title="Editar">✎</button>
@@ -544,7 +656,7 @@ function renderDeployments() {
       </div>`;
     }).join('');
 
-    const huLinks = d.hu_links ? d.hu_links.split('\n').filter(Boolean).map(l=>`<a class="task-link" href="${l.trim()}" target="_blank">↗ ${l.trim()}</a>`).join('') : '';
+    const huLinks = d.hu_links ? d.hu_links.split('\n').filter(Boolean).map(l=>`<a class="task-link" href="${l.trim()}" target="_blank">↗ ${esc(l.trim())}</a>`).join('') : '';
 
     return `<div class="deployment-card">
       <div class="dep-header" onclick="toggleDep('${d.id}')">
@@ -579,6 +691,9 @@ function renderDeployments() {
   }).join('');
 }
 
+// ════════════════════════════════════
+// ACCIONES
+// ════════════════════════════════════
 function toggleDep(id) {
   const d = cache.find(x=>x.id===id);
   if (d) { d.open=!d.open; renderDeployments(); }
@@ -598,6 +713,7 @@ async function toggleTask(depId, taskId) {
   } catch(e) { toast('Error: '+e.message,true); }
 }
 
+// ── DESPLIEGUE ──
 function openNewDeployModal() {
   if (session?.rol!=='desarrollador') return;
   _editingDepId = null;
@@ -658,6 +774,7 @@ async function saveNewDeploy() {
   finally { btn.disabled=false; }
 }
 
+// ── TAREA ──
 function openNewTask(depId) {
   if (session?.rol!=='desarrollador') return;
   _depEditing = depId;
@@ -697,7 +814,13 @@ async function saveTask() {
   const desc = document.getElementById('ntDesc').value.trim();
   if (!desc) { toast('La descripción es requerida',true); return; }
   const d = cache.find(x=>x.id===_depEditing);
-  const body = {tipo:document.getElementById('ntType').value,ambiente:document.getElementById('ntEnv').value.trim(),descripcion:desc,link:document.getElementById('ntLink').value.trim(),query_sql:document.getElementById('ntQuery').value.trim()};
+  const body = {
+    tipo:       document.getElementById('ntType').value,
+    ambiente:   document.getElementById('ntEnv').value.trim(),
+    descripcion:desc,
+    link:       document.getElementById('ntLink').value.trim(),
+    query_sql:  document.getElementById('ntQuery').value.trim()
+  };
   try {
     if (_editingTaskId) {
       await api(`tareas?id=eq.${_editingTaskId}`,{method:'PATCH',prefer:'return=minimal',body});
@@ -715,6 +838,7 @@ async function saveTask() {
   } catch(e) { toast('Error: '+e.message,true); }
 }
 
+// ── ELIMINAR TAREA ──
 function askDel(depId, taskId) { _taskDelDep=depId; _taskDelId=taskId; openModal('modalDel'); }
 
 async function confirmDelete() {
@@ -732,6 +856,35 @@ async function confirmDelete() {
   } catch(e) { toast('Error: '+e.message,true); }
 }
 
+// ── COMENTARIOS ──
+function openComment(depId, taskId, descPreview) {
+  if (session?.rol!=='soporte') { toast('Solo soporte puede comentar',true); return; }
+  _commentTaskId = taskId;
+  _commentDepId  = depId;
+  document.getElementById('commentText').value = '';
+  document.getElementById('commentTaskDesc').textContent = descPreview + (descPreview.length>=60?'...':'');
+  openModal('modalComment');
+}
+
+async function saveComment() {
+  const texto = document.getElementById('commentText').value.trim();
+  if (!texto) { toast('Escribe un comentario',true); return; }
+  const d = cache.find(x=>x.id===_commentDepId);
+  const t = d?.tasks.find(x=>x.id===_commentTaskId);
+  try {
+    await api('comentarios',{method:'POST',prefer:'return=minimal',body:{tarea_id:_commentTaskId,usuario_id:session.id,texto}});
+    await audit('tarea',_commentTaskId,'comentar',{descripcion:t?.descripcion,despliegue:d?.nombre,comentario:texto});
+    closeModal('modalComment'); toast('Comentario guardado');
+    await loadDeployments();
+    const dep = cache.find(x=>x.id===_commentDepId);
+    if (dep) dep.open=true;
+    renderDeployments();
+  } catch(e) { toast('Error: '+e.message,true); }
+}
+
+// ════════════════════════════════════
+// HISTORIAL
+// ════════════════════════════════════
 async function audit(entidad, id, accion, detalle) {
   try { await api('historial',{method:'POST',prefer:'return=minimal',body:{entidad,entidad_id:id,accion,usuario_id:session?.id,detalle}}); } catch(e){}
 }
@@ -743,23 +896,25 @@ async function loadHistorial() {
     const h = await api('historial?order=created_at.desc&limit=150&select=*,u:usuarios(nombre)');
     hide('loadingH');
     if (!h?.length) { show('emptyH'); return; }
-    const icons  = {crear:'＋',completar:'✓',descompletar:'↩',eliminar:'✕',editar:'✎',ingreso:'⏎'};
-    const cls    = {crear:'hi-crear',completar:'hi-completar',descompletar:'hi-descompletar',eliminar:'hi-eliminar',editar:'hi-editar',ingreso:'hi-ingreso'};
-    const verbos = {crear:'creó',completar:'completó tarea',descompletar:'desmarcó tarea',eliminar:'eliminó',editar:'editó'};
+    const icons  = {crear:'＋',completar:'✓',descompletar:'↩',eliminar:'✕',editar:'✎',ingreso:'⏎',comentar:'💬'};
+    const cls    = {crear:'hi-crear',completar:'hi-completar',descompletar:'hi-descompletar',eliminar:'hi-eliminar',editar:'hi-editar',ingreso:'hi-ingreso',comentar:'hi-comentar'};
+    const verbos = {crear:'creó',completar:'completó tarea',descompletar:'desmarcó tarea',eliminar:'eliminó',editar:'editó',comentar:'comentó en'};
     document.getElementById('histList').innerHTML = h.map(r => {
-      const det = r.detalle||{};
-      const who = r.u?.nombre||'?';
+      const det    = r.detalle||{};
+      const who    = r.u?.nombre||'?';
       const accion = r.accion||'';
       let titleHtml;
       if (accion==='ingreso') {
         const rolLabel = det.rol==='desarrollador'?'como desarrollador':'como soporte';
         titleHtml = `<b>${esc(who)}</b> ingresó a la app <span style="color:var(--text-3)">${rolLabel}</span>`;
+      } else if (accion==='comentar') {
+        titleHtml = `<b>${esc(who)}</b> comentó en tarea: "${esc(String(det.descripcion||'').substring(0,50))}"`;
       } else {
         const what = det.nombre||det.descripcion||r.entidad_id;
-        titleHtml = `<b>${esc(who)}</b> ${verbos[accion]||accion} ${r.entidad}: "${esc(what)}"`;
+        titleHtml = `<b>${esc(who)}</b> ${verbos[accion]||accion} ${r.entidad}: "${esc(String(what).substring(0,60))}"`;
       }
       const sub = det.despliegue?`despliegue: ${det.despliegue}`:'';
-      const ts = new Date(r.created_at).toLocaleString('es-CO',{timeZone:'America/Bogota',day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+      const ts  = new Date(r.created_at).toLocaleString('es-CO',{timeZone:'America/Bogota',day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
       return `<div class="hist-card">
         <div class="hist-icon ${cls[accion]||'hi-editar'}">${icons[accion]||'·'}</div>
         <div class="hist-body">
@@ -772,6 +927,9 @@ async function loadHistorial() {
   } catch(e) { hide('loadingH'); toast('Error historial: '+e.message,true); }
 }
 
+// ════════════════════════════════════
+// TABS
+// ════════════════════════════════════
 function switchTab(tab) {
   document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',(i===0&&tab==='despliegues')||(i===1&&tab==='historial')));
   document.getElementById('viewDespliegues').style.display = tab==='despliegues'?'block':'none';
@@ -779,6 +937,9 @@ function switchTab(tab) {
   if (tab==='historial') loadHistorial();
 }
 
+// ════════════════════════════════════
+// DRAG & DROP
+// ════════════════════════════════════
 function dragStart(e, depId, taskId) { _dragDepId=depId; _dragTaskId=taskId; e.dataTransfer.effectAllowed='move'; }
 function dragOver(e) { e.preventDefault(); e.currentTarget.classList.add('drag-over'); }
 function dragLeave(e) { e.currentTarget.classList.remove('drag-over'); }
@@ -794,8 +955,7 @@ async function dragDrop(e, targetDepId, targetTaskId) {
   if (fromIdx===-1||toIdx===-1) return;
   const [moved] = tasks.splice(fromIdx,1);
   tasks.splice(toIdx,0,moved);
-  const deleted = d.tasks.filter(t=>t.eliminada);
-  d.tasks = [...tasks,...deleted];
+  d.tasks = [...tasks,...d.tasks.filter(t=>t.eliminada)];
   renderDeployments();
   const dep = cache.find(x=>x.id===targetDepId);
   if (dep) dep.open=true;
@@ -806,6 +966,9 @@ async function dragDrop(e, targetDepId, targetTaskId) {
   } catch(err) { toast('Error guardando orden: '+err.message,true); }
 }
 
+// ════════════════════════════════════
+// UTILS
+// ════════════════════════════════════
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function show(id){ document.getElementById(id).style.display='block'; }
 function hide(id){ document.getElementById(id).style.display='none'; }
