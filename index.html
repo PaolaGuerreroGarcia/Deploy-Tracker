@@ -113,6 +113,11 @@ body { font-family:var(--font); background:var(--bg-0); color:var(--text-1); min
 .task-del-btn:hover { color:var(--red); }
 .task-edit-btn { background:none; border:none; color:var(--text-3); cursor:pointer; font-size:13px; padding:2px 5px; border-radius:var(--radius-sm); transition:color .15s; line-height:1; flex-shrink:0; margin-top:2px; }
 .task-edit-btn:hover { color:var(--blue-bright); }
+.copy-btn { background:none; border:none; color:var(--text-3); cursor:pointer; font-size:12px; padding:2px 4px; border-radius:var(--radius-sm); transition:color .15s; display:inline-flex; align-items:center; gap:3px; margin-left:6px; min-width:24px; }
+.copy-btn svg { width:14px; height:14px; stroke:currentColor; stroke-width:1.5; fill:none; transition:stroke .15s; }
+.copy-btn:hover { color:var(--blue-bright); }
+.copy-btn:hover svg { stroke:var(--blue-bright); }
+.copy-btn.copied { color:var(--green); }
 .task-actions { display:flex; flex-direction:column; gap:2px; flex-shrink:0; }
 .dep-edit-btn { background:none; border:1px solid var(--border); color:var(--text-3); cursor:pointer; font-size:11px; padding:3px 8px; border-radius:var(--radius-sm); font-family:var(--mono); transition:all .15s; flex-shrink:0; }
 .dep-edit-btn:hover { color:var(--blue-light); border-color:var(--border-hi); }
@@ -631,8 +636,10 @@ function renderDeployments() {
         <div class="task-checkbox${isDone?' checked':''}${!canCheck?' off':''}" onclick="${canCheck?`toggleTask('${d.id}','${t.id}')`:''}" style="${!canCheck?'cursor:default':''}"></div>
         <div class="task-content">
           <span class="task-tag" style="background:${tipoInfo(t.tipo).bg};color:${tipoInfo(t.tipo).color}">${tipoInfo(t.tipo).etiqueta}${t.ambiente?' · '+esc(t.ambiente):''}</span>
-          <div class="task-desc${isDone?' done-txt':''}${isDel?' del-txt':''}">${esc(t.descripcion)}</div>
-          ${t.query_sql?`<div class="task-query">${esc(t.query_sql)}</div>`:''}
+          <div style="display:flex;align-items:center;gap:4px">
+            <div class="task-desc${isDone?' done-txt':''}${isDel?' del-txt':''}">${esc(t.descripcion)}</div>
+            ${!isDel?`<button class="copy-btn" data-clipboard="${esc(t.descripcion).replace(/"/g,'&quot;')}" onclick="event.stopPropagation();copyToClipboard(this)" title="Copiar descripción"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="12" height="12" rx="1"/><rect x="8" y="8" width="12" height="12" rx="1"/></svg></button>`:''}          </div>
+          ${t.query_sql?`<div style="display:flex;align-items:center;gap:4px"><div class="task-query">${esc(t.query_sql)}</div><button class="copy-btn" data-clipboard="${esc(t.query_sql).replace(/"/g,'&quot;')}" onclick="event.stopPropagation();copyToClipboard(this)" title="Copiar query" style="margin-left:auto;margin-top:0"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="12" height="12" rx="1"/><rect x="8" y="8" width="12" height="12" rx="1"/></svg></button></div>`:''}
           ${t.link?t.link.split('\n').filter(Boolean).map(l=>`<a class="task-link" href="${l.trim()}" target="_blank">↗ ${esc(l.trim())}</a>`).join(''):''}
           ${isDone&&t.cmp_u?`<div class="task-audit">✓ completada por <b style="color:var(--green)">${esc(t.cmp_u.nombre)}</b>${cAt?' · '+cAt:''}</div>`:''}
           ${isDel&&t.del_u?`<div class="task-audit" style="color:var(--red)">✕ eliminada por <b>${esc(t.del_u.nombre)}</b></div>`:''}
@@ -655,7 +662,10 @@ function renderDeployments() {
         <div class="dep-left">
           <span class="dep-date">${ds}</span>
           <div class="dep-info">
-            <div class="dep-name">${esc(d.nombre)}</div>
+            <div style="display:flex;align-items:center;gap:4px">
+              <div class="dep-name">${esc(d.nombre)}</div>
+              <button class="copy-btn" data-clipboard="${esc(d.nombre).replace(/"/g,'&quot;')}" onclick="event.stopPropagation();copyToClipboard(this)" title="Copiar nombre del release"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="12" height="12" rx="1"/><rect x="8" y="8" width="12" height="12" rx="1"/></svg></button>
+            </div>
             <div class="dep-meta">${esc(d.proyecto||'')} · ${esc(d.ambiente)} · ${done}/${total} tareas</div>
             <div class="dep-persons">
               <span class="person-tag person-dev">dev: ${esc(d.dev?.nombre||'—')}</span>
@@ -930,8 +940,29 @@ function switchTab(tab) {
 }
 
 // ════════════════════════════════════
-// DRAG & DROP
+// COPIAR AL PORTAPAPELES
 // ════════════════════════════════════
+async function copyToClipboard(btn) {
+  const text = btn.getAttribute('data-clipboard') || '';
+  const svg = btn.querySelector('svg');
+  try {
+    await navigator.clipboard.writeText(text);
+    btn.classList.add('copied');
+    if (svg) svg.style.display = 'none';
+    btn.textContent = '✓';
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      btn.textContent = '';
+      if (svg) {
+        svg.style.display = 'block';
+        btn.appendChild(svg);
+      }
+    }, 1500);
+  } catch (err) {
+    toast('Error al copiar: ' + err.message, true);
+  }
+}
+
 function dragStart(e, depId, taskId) { _dragDepId=depId; _dragTaskId=taskId; e.dataTransfer.effectAllowed='move'; }
 function dragOver(e) { e.preventDefault(); e.currentTarget.classList.add('drag-over'); }
 function dragLeave(e) { e.currentTarget.classList.remove('drag-over'); }
