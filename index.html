@@ -12,7 +12,7 @@
   --blue-dim:#1d3a6e; --blue-mid:#2563eb; --blue-bright:#3b82f6; --blue-light:#93c5fd;
   --text-1:#e2e8f0; --text-2:#94a3b8; --text-3:#4b6080;
   --border:rgba(59,130,246,0.15); --border-hi:rgba(59,130,246,0.35);
-  --green:#34d399; --amber:#fbbf24; --red:#f87171;
+  --green:#34d399; --amber:#fbbf24; --red:#f87171; --purple:#a78bfa;
   --radius-sm:4px; --radius-md:8px; --radius-lg:12px;
   --font:'IBM Plex Sans',sans-serif; --mono:'IBM Plex Mono',monospace;
 }
@@ -42,6 +42,9 @@ body { font-family:var(--font); background:var(--bg-0); color:var(--text-1); min
 .btn-ghost:hover { background:var(--bg-2); color:var(--text-1); }
 .btn-danger { background:rgba(248,113,113,.15); border:1px solid rgba(248,113,113,.3); color:var(--red); padding:8px 16px; border-radius:var(--radius-md); font-size:13px; cursor:pointer; font-family:var(--font); transition:all .15s; }
 .btn-danger:hover { background:rgba(248,113,113,.25); }
+.btn-purple { background:rgba(167,139,250,.15); border:1px solid rgba(167,139,250,.3); color:var(--purple); padding:9px 18px; border-radius:var(--radius-md); font-size:13px; font-weight:500; cursor:pointer; font-family:var(--font); display:flex; align-items:center; gap:6px; transition:all .15s; }
+.btn-purple:hover { background:rgba(167,139,250,.25); }
+.btn-purple:disabled { opacity:.4; cursor:not-allowed; }
 
 /* TABS */
 .tabs { display:flex; gap:4px; margin-bottom:1.5rem; background:var(--bg-1); border:1px solid var(--border); border-radius:var(--radius-md); padding:4px; width:fit-content; }
@@ -87,7 +90,7 @@ body { font-family:var(--font); background:var(--bg-0); color:var(--text-1); min
 /* TASKS */
 .tasks-body { display:none; border-top:1px solid var(--border); }
 .tasks-body.open { display:block; }
-.tasks-header-label { padding:8px 18px 6px; font-size:10px; font-weight:500; font-family:var(--mono); color:var(--text-3); text-transform:uppercase; letter-spacing:.08em; background:var(--bg-2); border-bottom:1px solid var(--border); }
+.tasks-header-label { padding:8px 18px 6px; font-size:10px; font-weight:500; font-family:var(--mono); color:var(--text-3); text-transform:uppercase; letter-spacing:.08em; background:var(--bg-2); border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
 .task-row { display:flex; align-items:flex-start; gap:12px; padding:11px 18px; border-bottom:1px solid var(--border); transition:background .12s; }
 .task-row:last-of-type { border-bottom:none; }
 .task-row:hover { background:rgba(255,255,255,.02); }
@@ -124,6 +127,32 @@ body { font-family:var(--font); background:var(--bg-0); color:var(--text-1); min
 .add-task-row { display:flex; align-items:center; gap:8px; padding:10px 18px; font-size:12px; color:var(--text-3); cursor:pointer; border:none; background:none; width:100%; text-align:left; font-family:var(--font); border-top:1px solid var(--border); transition:color .15s,background .15s; }
 .add-task-row:hover { color:var(--blue-light); background:rgba(37,99,235,.06); }
 
+/* ARCHIVOS */
+.files-section { border-top:1px solid var(--border); padding:12px 18px; background:var(--bg-2); }
+.files-section-title { font-size:10px; font-weight:500; font-family:var(--mono); color:var(--text-3); text-transform:uppercase; letter-spacing:.08em; margin-bottom:10px; display:flex; align-items:center; justify-content:space-between; }
+.file-list { display:flex; flex-direction:column; gap:6px; margin-bottom:10px; }
+.file-item { display:flex; align-items:center; gap:10px; padding:8px 12px; background:var(--bg-1); border:1px solid var(--border); border-radius:var(--radius-md); }
+.file-icon { font-size:14px; flex-shrink:0; }
+.file-name { font-size:12px; font-family:var(--mono); color:var(--text-2); flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.file-size { font-size:10px; color:var(--text-3); font-family:var(--mono); flex-shrink:0; }
+.file-date { font-size:10px; color:var(--text-3); font-family:var(--mono); flex-shrink:0; }
+.file-download { background:none; border:1px solid var(--border-hi); color:var(--blue-light); cursor:pointer; font-size:11px; padding:3px 8px; border-radius:var(--radius-sm); font-family:var(--mono); transition:all .15s; flex-shrink:0; text-decoration:none; display:inline-flex; align-items:center; gap:4px; }
+.file-download:hover { background:var(--blue-dim); }
+.file-delete { background:none; border:1px solid rgba(248,113,113,.25); color:var(--red); cursor:pointer; font-size:11px; padding:3px 8px; border-radius:var(--radius-sm); font-family:var(--mono); transition:all .15s; flex-shrink:0; }
+.file-delete:hover { background:rgba(248,113,113,.15); }
+.file-empty { font-size:12px; color:var(--text-3); font-family:var(--mono); padding:8px 0; }
+.upload-zone { border:1.5px dashed var(--border-hi); border-radius:var(--radius-md); padding:16px; text-align:center; cursor:pointer; transition:all .2s; background:var(--bg-0); position:relative; }
+.upload-zone:hover,.upload-zone.drag-active { border-color:var(--purple); background:rgba(167,139,250,.05); }
+.upload-zone input { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; }
+.upload-zone-text { font-size:12px; color:var(--text-3); font-family:var(--mono); pointer-events:none; }
+.upload-zone-text span { color:var(--purple); }
+.upload-progress { margin-top:8px; }
+.upload-progress-bar { height:3px; background:var(--bg-4); border-radius:2px; overflow:hidden; }
+.upload-progress-fill { height:100%; background:var(--purple); border-radius:2px; transition:width .3s; }
+.upload-status { font-size:11px; color:var(--text-3); font-family:var(--mono); margin-top:4px; }
+.storage-cfg-banner { background:rgba(59,130,246,.06); border:1px solid rgba(59,130,246,.2); border-radius:var(--radius-md); padding:12px 16px; margin-bottom:10px; font-size:12px; color:var(--text-2); line-height:1.6; }
+.storage-cfg-banner b { color:var(--blue-light); }
+
 /* COMENTARIOS */
 .task-comments { margin-top:10px; border-top:1px solid var(--border); padding-top:8px; }
 .comment-item { display:flex; gap:8px; margin-bottom:8px; }
@@ -146,11 +175,17 @@ body { font-family:var(--font); background:var(--bg-0); color:var(--text-1); min
 .hi-editar       { background:rgba(148,163,184,.1);  color:var(--text-2); }
 .hi-ingreso      { background:rgba(99,102,241,.15);  color:#a5b4fc; }
 .hi-comentar     { background:rgba(251,191,36,.1);   color:var(--amber); }
+.hi-archivo      { background:rgba(167,139,250,.12); color:var(--purple); }
 .hist-body { flex:1; }
 .hist-title { font-size:13px; color:var(--text-1); line-height:1.5; }
 .hist-title b { color:var(--blue-light); font-weight:500; }
 .hist-sub { font-size:11px; color:var(--text-3); font-family:var(--mono); margin-top:3px; }
 .hist-time { font-size:10px; color:var(--text-3); font-family:var(--mono); white-space:nowrap; flex-shrink:0; }
+
+/* HIST INFO BAR */
+.hist-info-bar { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; padding:10px 14px; background:var(--bg-2); border:1px solid var(--border); border-radius:var(--radius-md); }
+.hist-info-text { font-size:11px; color:var(--text-3); font-family:var(--mono); }
+.hist-info-text span { color:var(--amber); }
 
 /* MODAL */
 .modal-backdrop { display:none; position:fixed; inset:0; background:rgba(0,0,0,.8); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); z-index:200; align-items:center; justify-content:center; padding:1rem; }
@@ -180,12 +215,15 @@ body { font-family:var(--font); background:var(--bg-0); color:var(--text-1); min
 .rol-card-sub { font-size:11px; color:var(--text-3); font-family:var(--mono); margin-top:3px; }
 .session-error { font-size:11px; color:var(--red); font-family:var(--mono); margin-top:6px; min-height:14px; text-align:center; }
 
+
+
 /* UTILS */
 .empty-state { text-align:center; padding:4rem 2rem; color:var(--text-3); border:1px dashed var(--border); border-radius:var(--radius-lg); }
 .empty-state p { font-family:var(--mono); font-size:13px; }
 .loading { text-align:center; padding:2rem; color:var(--text-3); font-family:var(--mono); font-size:12px; }
 .toast { position:fixed; bottom:24px; right:24px; background:var(--bg-2); border:1px solid var(--border-hi); border-radius:var(--radius-md); padding:10px 16px; font-size:13px; color:var(--text-1); z-index:999; animation:tIn .2s ease; box-shadow:0 8px 24px rgba(0,0,0,.5); pointer-events:none; }
 .toast.err { border-color:rgba(248,113,113,.4); color:var(--red); }
+.toast.ok  { border-color:rgba(52,211,153,.3);  color:var(--green); }
 @keyframes tIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:none} }
 @media(max-width:600px){
   .form-row { grid-template-columns:1fr; }
@@ -223,6 +261,7 @@ body { font-family:var(--font); background:var(--bg-0); color:var(--text-1); min
         <button class="btn-xs" onclick="openModal('modalSession')">cambiar</button>
         <button class="btn-xs" style="color:var(--red);border-color:rgba(248,113,113,.3)" onclick="cerrarSesion()">salir</button>
       </div>
+
       <button class="btn-primary" id="btnNuevo" onclick="openNewDeployModal()" disabled>
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
         Nuevo despliegue
@@ -254,6 +293,10 @@ body { font-family:var(--font); background:var(--bg-0); color:var(--text-1); min
   </div>
 
   <div id="viewHistorial" style="display:none">
+    <div class="hist-info-bar">
+      <span class="hist-info-text">Mostrando últimos 50 registros · <span>se eliminan automáticamente después de 60 días</span></span>
+      <span class="hist-info-text" id="histCount" style="color:var(--text-2)"></span>
+    </div>
     <div class="loading" id="loadingH" style="display:none">// cargando historial...</div>
     <div class="hist-list" id="histList"></div>
     <div class="empty-state" id="emptyH" style="display:none"><p>// sin registros aún.</p></div>
@@ -394,6 +437,8 @@ body { font-family:var(--font); background:var(--bg-0); color:var(--text-1); min
   </div>
 </div>
 
+
+
 <script>
 // ════════════════════════════════════
 // CONFIGURACIÓN SUPABASE
@@ -402,12 +447,29 @@ let SB_URL = 'https://dmhaecdarwaoarqsflsa.supabase.co/';
 let SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRtaGFlY2Rhcndhb2FycXNmbHNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NzYzNTgsImV4cCI6MjA4OTI1MjM1OH0.1e4CweDx3OXPSUjFhOe8gMIIW0u3uF8oOCbnAAUZtyU';
 
 // ════════════════════════════════════
+// ONEDRIVE CONFIG
+// ════════════════════════════════════
+const STORAGE_BUCKET = 'deploy-files';
+
+// ════════════════════════════════════
+// SERVICIOS AWS EXTRAS (tipos de tarea hardcoded extras)
+// Se fusionan con los que vienen de la BD
+// ════════════════════════════════════
+const AWS_EXTRA_TIPOS = [
+  { clave:'secretmanager', etiqueta:'Secret Manager',  color_bg:'rgba(255,153,0,.12)',  color_texto:'#ffaa33' },
+  { clave:'dynamodb',      etiqueta:'DynamoDB',         color_bg:'rgba(52,211,153,.1)',  color_texto:'#34d399' },
+  { clave:'cognito',       etiqueta:'Cognito',          color_bg:'rgba(99,102,241,.15)', color_texto:'#a5b4fc' },
+  { clave:'apigateway',    etiqueta:'API Gateway',      color_bg:'rgba(251,191,36,.1)',  color_texto:'#fbbf24' },
+  { clave:'elasticsearch', etiqueta:'Elasticsearch',    color_bg:'rgba(236,72,153,.12)', color_texto:'#f472b6' },
+];
+
+// ════════════════════════════════════
 // ESTADO
 // ════════════════════════════════════
 let CAT_INTEGRANTES = [];
-let CAT_TIPOS = [];
-let session = JSON.parse(localStorage.getItem('dt_session') || 'null');
-let cache = [];
+let CAT_TIPOS       = [];
+let session         = JSON.parse(localStorage.getItem('dt_session') || 'null');
+let cache           = [];
 let _depEditing     = null;
 let _taskDelDep     = null;
 let _taskDelId      = null;
@@ -462,7 +524,10 @@ async function boot() {
       api('tipos_tarea?activo=eq.true&order=etiqueta.asc')
     ]);
     CAT_INTEGRANTES = integrantes||[];
-    CAT_TIPOS = tipos||[];
+    // Fusionar tipos de la BD con tipos AWS extras
+    const dbTipos = tipos||[];
+    const extrasFiltrados = AWS_EXTRA_TIPOS.filter(e => !dbTipos.find(d=>d.clave===e.clave));
+    CAT_TIPOS = [...dbTipos, ...extrasFiltrados];
     poblarTipos();
     poblarSelectSoporte();
   } catch(e) { toast('Error cargando catálogos: '+e.message,true); }
@@ -568,11 +633,15 @@ async function loadDeployments() {
     const deps     = await api('despliegues?order=created_at.desc&select=*,dev:usuarios!despliegues_desarrollador_id_fkey(nombre),sup:usuarios!despliegues_soporte_id_fkey(nombre)');
     const tasks    = await api('tareas?order=orden.asc,created_at.asc&select=*,cmp_u:usuarios!tareas_completada_por_fkey(nombre),del_u:usuarios!tareas_eliminada_por_fkey(nombre)');
     const comments = await api('comentarios?order=created_at.asc&select=*,u:usuarios(nombre)');
+    // Cargar archivos de cada despliegue
+    let archivos = [];
+    try { archivos = await api('archivos_deploy?order=created_at.desc&select=*,u:usuarios(nombre)') || []; } catch(e){}
     cache = (deps||[]).map(d=>({
       ...d, open:false,
       tasks:(tasks||[]).filter(t=>t.despliegue_id===d.id).map(t=>({
         ...t, comments:(comments||[]).filter(c=>c.tarea_id===t.id)
-      }))
+      })),
+      archivos: archivos.filter(a=>a.despliegue_id===d.id)
     }));
     hide('loadingD');
     renderDeployments();
@@ -585,6 +654,21 @@ async function loadDeployments() {
 function tipoInfo(clave) {
   const t = CAT_TIPOS.find(x=>x.clave===clave);
   return t ? {etiqueta:t.etiqueta,bg:t.color_bg,color:t.color_texto} : {etiqueta:clave,bg:'#1e2535',color:'#94a3b8'};
+}
+
+function fmtFileSize(bytes) {
+  if (!bytes) return '';
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1048576) return (bytes/1024).toFixed(1) + ' KB';
+  return (bytes/1048576).toFixed(1) + ' MB';
+}
+
+function fileIcon(name) {
+  const ext = (name||'').split('.').pop().toLowerCase();
+  if (ext==='zip'||ext==='rar'||ext==='7z') return '🗜️';
+  if (['png','jpg','jpeg','gif','webp','svg'].includes(ext)) return '🖼️';
+  if (ext==='pdf') return '📄';
+  return '📎';
 }
 
 function renderDeployments() {
@@ -603,7 +687,6 @@ function renderDeployments() {
     const stL = {pending:'pendiente',progress:'en progreso',done:'completado'};
     const stC = {pending:'badge-pending',progress:'badge-progress',done:'badge-done'};
     const ds = d.fecha ? new Date(d.fecha+'T12:00:00').toLocaleDateString('es-CO',{timeZone:'America/Bogota',day:'2-digit',month:'short',year:'numeric'}) : '';
-    // Solo el creador del despliegue puede editarlo
     const canEditDep = isDev && d.creado_por === session.id;
 
     const tasksHtml = d.tasks.map(t => {
@@ -611,7 +694,6 @@ function renderDeployments() {
       const isDone = t.completada && !isDel;
       const cAt = t.completada_at ? new Date(t.completada_at).toLocaleString('es-CO',{timeZone:'America/Bogota',day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}) : '';
       const canCheck = isSup && !isDel;
-      // Solo el creador de la tarea puede editarla/eliminarla/arrastrarla
       const canEditTask = isDev && !isDel && t.creado_por === session.id;
 
       const commentsHtml = (t.comments||[]).map(c => {
@@ -638,7 +720,8 @@ function renderDeployments() {
           <span class="task-tag" style="background:${tipoInfo(t.tipo).bg};color:${tipoInfo(t.tipo).color}">${tipoInfo(t.tipo).etiqueta}${t.ambiente?' · '+esc(t.ambiente):''}</span>
           <div style="display:flex;align-items:center;gap:4px">
             <div class="task-desc${isDone?' done-txt':''}${isDel?' del-txt':''}">${esc(t.descripcion)}</div>
-            ${!isDel?`<button class="copy-btn" data-clipboard="${esc(t.descripcion).replace(/"/g,'&quot;')}" onclick="event.stopPropagation();copyToClipboard(this)" title="Copiar descripción"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="12" height="12" rx="1"/><rect x="8" y="8" width="12" height="12" rx="1"/></svg></button>`:''}          </div>
+            ${!isDel?`<button class="copy-btn" data-clipboard="${esc(t.descripcion).replace(/"/g,'&quot;')}" onclick="event.stopPropagation();copyToClipboard(this)" title="Copiar descripción"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="12" height="12" rx="1"/><rect x="8" y="8" width="12" height="12" rx="1"/></svg></button>`:''}
+          </div>
           ${t.query_sql?`<div style="display:flex;align-items:center;gap:4px"><div class="task-query">${esc(t.query_sql)}</div><button class="copy-btn" data-clipboard="${esc(t.query_sql).replace(/"/g,'&quot;')}" onclick="event.stopPropagation();copyToClipboard(this)" title="Copiar query" style="margin-left:auto;margin-top:0"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="12" height="12" rx="1"/><rect x="8" y="8" width="12" height="12" rx="1"/></svg></button></div>`:''}
           ${t.link?t.link.split('\n').filter(Boolean).map(l=>`<a class="task-link" href="${l.trim()}" target="_blank">↗ ${esc(l.trim())}</a>`).join(''):''}
           ${isDone&&t.cmp_u?`<div class="task-audit">✓ completada por <b style="color:var(--green)">${esc(t.cmp_u.nombre)}</b>${cAt?' · '+cAt:''}</div>`:''}
@@ -655,6 +738,9 @@ function renderDeployments() {
       </div>`;
     }).join('');
 
+    // Archivos del despliegue
+    const archivosHtml = renderArchivos(d);
+
     const huLinks = d.hu_links ? d.hu_links.split('\n').filter(Boolean).map(l=>`<a class="task-link" href="${l.trim()}" target="_blank">↗ ${esc(l.trim())}</a>`).join('') : '';
 
     return `<div class="deployment-card">
@@ -666,7 +752,7 @@ function renderDeployments() {
               <div class="dep-name">${esc(d.nombre)}</div>
               <button class="copy-btn" data-clipboard="${esc(d.nombre).replace(/"/g,'&quot;')}" onclick="event.stopPropagation();copyToClipboard(this)" title="Copiar nombre del release"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="12" height="12" rx="1"/><rect x="8" y="8" width="12" height="12" rx="1"/></svg></button>
             </div>
-            <div class="dep-meta">${esc(d.proyecto||'')} · ${esc(d.ambiente)} · ${done}/${total} tareas</div>
+            <div class="dep-meta">${esc(d.proyecto||'')} · ${esc(d.ambiente)} · ${done}/${total} tareas · ${(d.archivos||[]).length} archivo(s)</div>
             <div class="dep-persons">
               <span class="person-tag person-dev">dev: ${esc(d.dev?.nombre||'—')}</span>
               <span class="person-tag person-sup">soporte: ${esc(d.sup?.nombre||'—')}</span>
@@ -685,14 +771,176 @@ function renderDeployments() {
         </div>
       </div>
       <div class="tasks-body${d.open?' open':''}" id="tb-${d.id}">
-        ${d.tasks.length?'<div class="tasks-header-label">// tareas de soporte</div>':''}
+        ${d.tasks.length?'<div class="tasks-header-label"><span>// tareas de soporte</span></div>':''}
         ${tasksHtml}
         ${isDev?`<button class="add-task-row" onclick="openNewTask('${d.id}')">＋ agregar tarea</button>`:''}
+        ${archivosHtml}
       </div>
     </div>`;
   }).join('');
 }
 
+// ════════════════════════════════════
+// ARCHIVOS - RENDER
+// ════════════════════════════════════
+function renderArchivos(d) {
+  const archivos = d.archivos || [];
+  const storageReady = !!(SB_URL && SB_KEY) && session?.rol === 'desarrollador';
+
+  const filesHtml = archivos.length
+    ? archivos.map(a => {
+        const ts = new Date(a.created_at).toLocaleDateString('es-CO',{timeZone:'America/Bogota',day:'2-digit',month:'short'});
+        const canDelete = session && a.subido_por === session.id;
+        return `<div class="file-item">
+          <span class="file-icon">${fileIcon(a.nombre)}</span>
+          <span class="file-name" title="${esc(a.nombre)}">${esc(a.nombre)}</span>
+          <span class="file-size">${fmtFileSize(a.tamano)}</span>
+          <span class="file-date">${ts}</span>
+          <a class="file-download" href="${esc(a.url_descarga)}" target="_blank">↓ descargar</a>
+          ${canDelete ? `<button class="file-delete" onclick="deleteArchivo('${a.id}','${esc(a.nombre_od)}','${d.id}')" title="Eliminar archivo">✕</button>` : ''}
+        </div>`;
+      }).join('')
+    : `<div class="file-empty">// sin archivos adjuntos</div>`;
+
+  const uploadSection = storageReady
+    ? `<div class="upload-zone" id="uz-${d.id}"
+        ondragover="event.preventDefault();this.classList.add('drag-active')"
+        ondragleave="this.classList.remove('drag-active')"
+        ondrop="handleFileDrop(event,'${d.id}')">
+        <input type="file" accept=".zip,.png,.jpg,.jpeg,.gif,.webp,.pdf,.rar,.7z,.xlsx,.csv,.txt,.docx" onchange="handleFileSelect(event,'${d.id}')" />
+        <div class="upload-zone-text">Arrastra aquí o <span>selecciona</span> un archivo</div>
+      </div>
+      <div class="upload-progress" id="up-${d.id}" style="display:none">
+        <div class="upload-progress-bar"><div class="upload-progress-fill" id="upf-${d.id}" style="width:0%"></div></div>
+        <div class="upload-status" id="ups-${d.id}">Subiendo...</div>
+      </div>`
+    : `<div class="storage-cfg-banner">📁 Configura Supabase para adjuntar archivos.</div>`;
+
+  return `<div class="files-section">
+    <div class="files-section-title"><span>📎 archivos adjuntos</span></div>
+    <div class="file-list">${filesHtml}</div>
+    ${uploadSection}
+  </div>`;
+}
+// ════════════════════════════════════
+// ONEDRIVE - CONFIG
+// ════════════════════════════════════
+// ARCHIVOS - UPLOAD (Supabase Storage)
+// ════════════════════════════════════
+async function apiStorage(filePath, file) {
+  const base = SB_URL.replace(/\/$/,'');
+  const r = await fetch(`${base}/storage/v1/object/${STORAGE_BUCKET}/${filePath}`, {
+    method: 'POST',
+    headers: {
+      'apikey': SB_KEY,
+      'Authorization': 'Bearer ' + SB_KEY,
+      'Content-Type': file.type || 'application/octet-stream',
+      'x-upsert': 'true'
+    },
+    body: file
+  });
+  if (!r.ok) {
+    const t = await r.text().catch(()=>'');
+    throw new Error(t || r.statusText);
+  }
+  return true;
+}
+
+function getPublicUrl(filePath) {
+  const base = SB_URL.replace(/\/$/,'');
+  return `${base}/storage/v1/object/public/${STORAGE_BUCKET}/${filePath}`;
+}
+
+async function handleFileDrop(e, depId) {
+  e.preventDefault();
+  const uz = document.getElementById('uz-'+depId);
+  if (uz) uz.classList.remove('drag-active');
+  const file = e.dataTransfer.files[0];
+  if (file) await uploadFile(file, depId);
+}
+
+function handleFileSelect(e, depId) {
+  const file = e.target.files[0];
+  if (file) uploadFile(file, depId);
+  e.target.value = '';
+}
+
+async function uploadFile(file, depId) {
+  const MAX_MB = 50;
+  if (file.size > MAX_MB * 1024 * 1024) { toast(`Archivo muy grande (máx ${MAX_MB}MB)`, true); return; }
+
+  const upProg = document.getElementById('up-'+depId);
+  const upFill = document.getElementById('upf-'+depId);
+  const upStat = document.getElementById('ups-'+depId);
+  if (upProg) upProg.style.display = 'block';
+  if (upStat) upStat.textContent = 'Subiendo...';
+  if (upFill) upFill.style.width = '20%';
+
+  try {
+    const d = cache.find(x => x.id === depId);
+    const safeName = file.name.replace(/[^a-zA-Z0-9._\-]/g, '_');
+    const filePath = `${depId}/${Date.now()}_${safeName}`;
+
+    if (upFill) upFill.style.width = '50%';
+
+    await apiStorage(filePath, file);
+
+    if (upFill) upFill.style.width = '80%';
+
+    const urlDescarga = getPublicUrl(filePath);
+
+    await api('archivos_deploy', {
+      method: 'POST',
+      body: {
+        despliegue_id: depId,
+        nombre: file.name,
+        nombre_od: filePath,
+        url_descarga: urlDescarga,
+        tamano: file.size,
+        tipo_mime: file.type || 'application/octet-stream',
+        subido_por: session?.id
+      }
+    });
+
+    if (upFill) upFill.style.width = '100%';
+    if (upStat) upStat.textContent = '✓ Subido correctamente';
+    setTimeout(() => { if (upProg) upProg.style.display = 'none'; if (upFill) upFill.style.width = '0%'; }, 2000);
+
+    await audit('despliegue', depId, 'archivo', { nombre: file.name, despliegue: d?.nombre });
+    toast('✓ Archivo subido', 'ok');
+    await loadDeployments();
+    const dep = cache.find(x => x.id === depId);
+    if (dep) dep.open = true;
+    renderDeployments();
+  } catch(e) {
+    if (upProg) upProg.style.display = 'none';
+    toast('Error al subir: ' + e.message, true);
+  }
+}
+
+async function deleteArchivo(archivoId, filePath, depId) {
+  if (!confirm('¿Eliminar este archivo? Esta acción no se puede deshacer.')) return;
+  try {
+    // 1. Borrar del Storage
+    const base = SB_URL.replace(/\/$/,'');
+    const r = await fetch(`${base}/storage/v1/object/${STORAGE_BUCKET}/${filePath}`, {
+      method: 'DELETE',
+      headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY }
+    });
+    if (!r.ok) { const t = await r.text().catch(()=>''); throw new Error(t || r.statusText); }
+
+    // 2. Borrar el registro de la tabla
+    await api(`archivos_deploy?id=eq.${archivoId}`, { method: 'DELETE', prefer: 'return=minimal' });
+
+    toast('✓ Archivo eliminado', 'ok');
+    await loadDeployments();
+    const dep = cache.find(x => x.id === depId);
+    if (dep) dep.open = true;
+    renderDeployments();
+  } catch(e) {
+    toast('Error al eliminar: ' + e.message, true);
+  }
+}
 // ════════════════════════════════════
 // ACCIONES
 // ════════════════════════════════════
@@ -885,22 +1133,45 @@ async function saveComment() {
 }
 
 // ════════════════════════════════════
-// HISTORIAL
+// HISTORIAL — con limpieza de 60 días
 // ════════════════════════════════════
 async function audit(entidad, id, accion, detalle) {
+  // No guardar ingresos si el historial ya tiene muchos registros
   try { await api('historial',{method:'POST',prefer:'return=minimal',body:{entidad,entidad_id:id,accion,usuario_id:session?.id,detalle}}); } catch(e){}
+}
+
+async function limpiarHistorialAntiguo() {
+  // Eliminar registros con más de 60 días
+  try {
+    const fechaLimite = new Date();
+    fechaLimite.setDate(fechaLimite.getDate() - 60);
+    const isoLimite = fechaLimite.toISOString();
+    await api(`historial?created_at=lt.${isoLimite}`, { method:'DELETE', prefer:'return=minimal' });
+  } catch(e) {
+    console.warn('No se pudo limpiar historial antiguo:', e.message);
+  }
 }
 
 async function loadHistorial() {
   show('loadingH'); hide('emptyH');
   document.getElementById('histList').innerHTML='';
+  document.getElementById('histCount').textContent='';
+
+  // Limpiar registros mayores a 60 días antes de cargar
+  await limpiarHistorialAntiguo();
+
   try {
-    const h = await api('historial?order=created_at.desc&limit=150&select=*,u:usuarios(nombre)');
+    const h = await api('historial?order=created_at.desc&limit=50&select=*,u:usuarios(nombre)');
     hide('loadingH');
+
+    if (h?.length) {
+      document.getElementById('histCount').textContent = `${h.length} registro(s)`;
+    }
+
     if (!h?.length) { show('emptyH'); return; }
-    const icons  = {crear:'＋',completar:'✓',descompletar:'↩',eliminar:'✕',editar:'✎',ingreso:'⏎',comentar:'💬'};
-    const cls    = {crear:'hi-crear',completar:'hi-completar',descompletar:'hi-descompletar',eliminar:'hi-eliminar',editar:'hi-editar',ingreso:'hi-ingreso',comentar:'hi-comentar'};
-    const verbos = {crear:'creó',completar:'completó tarea',descompletar:'desmarcó tarea',eliminar:'eliminó',editar:'editó',comentar:'comentó en'};
+    const icons  = {crear:'＋',completar:'✓',descompletar:'↩',eliminar:'✕',editar:'✎',ingreso:'⏎',comentar:'💬',archivo:'📎'};
+    const cls    = {crear:'hi-crear',completar:'hi-completar',descompletar:'hi-descompletar',eliminar:'hi-eliminar',editar:'hi-editar',ingreso:'hi-ingreso',comentar:'hi-comentar',archivo:'hi-archivo'};
+    const verbos = {crear:'creó',completar:'completó tarea',descompletar:'desmarcó tarea',eliminar:'eliminó',editar:'editó',comentar:'comentó en',archivo:'subió archivo a'};
     document.getElementById('histList').innerHTML = h.map(r => {
       const det = r.detalle||{};
       const who = r.u?.nombre||'?';
@@ -911,11 +1182,13 @@ async function loadHistorial() {
         titleHtml = `<b>${esc(who)}</b> ingresó a la app <span style="color:var(--text-3)">${rolLabel}</span>`;
       } else if (accion==='comentar') {
         titleHtml = `<b>${esc(who)}</b> comentó en tarea: "${esc(String(det.descripcion||'').substring(0,50))}"`;
+      } else if (accion==='archivo') {
+        titleHtml = `<b>${esc(who)}</b> subió archivo <b style="color:var(--purple)">${esc(String(det.nombre||'').substring(0,40))}</b> al despliegue: "${esc(String(det.despliegue||'').substring(0,40))}"`;
       } else {
         const what = det.nombre||det.descripcion||r.entidad_id;
         titleHtml = `<b>${esc(who)}</b> ${verbos[accion]||accion} ${r.entidad}: "${esc(String(what).substring(0,60))}"`;
       }
-      const sub = det.despliegue?`despliegue: ${det.despliegue}`:'';
+      const sub = det.despliegue&&accion!=='archivo'?`despliegue: ${det.despliegue}`:'';
       const ts  = new Date(r.created_at).toLocaleString('es-CO',{timeZone:'America/Bogota',day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
       return `<div class="hist-card">
         <div class="hist-icon ${cls[accion]||'hi-editar'}">${icons[accion]||'·'}</div>
@@ -953,14 +1226,9 @@ async function copyToClipboard(btn) {
     setTimeout(() => {
       btn.classList.remove('copied');
       btn.textContent = '';
-      if (svg) {
-        svg.style.display = 'block';
-        btn.appendChild(svg);
-      }
+      if (svg) { svg.style.display = 'block'; btn.appendChild(svg); }
     }, 1500);
-  } catch (err) {
-    toast('Error al copiar: ' + err.message, true);
-  }
+  } catch (err) { toast('Error al copiar: ' + err.message, true); }
 }
 
 function dragStart(e, depId, taskId) { _dragDepId=depId; _dragTaskId=taskId; e.dataTransfer.effectAllowed='move'; }
@@ -1000,9 +1268,11 @@ function closeModal(id){ document.getElementById(id).classList.remove('open'); }
 document.addEventListener('keydown',e=>{ if(e.key==='Escape') document.querySelectorAll('.modal-backdrop.open:not(#modalSession)').forEach(m=>m.classList.remove('open')); });
 
 let _tt;
-function toast(msg,err=false){
+function toast(msg,isErr=false){
   clearTimeout(_tt); const old=document.querySelector('.toast'); if(old)old.remove();
-  const t=document.createElement('div'); t.className='toast'+(err?' err':''); t.textContent=msg;
+  const t=document.createElement('div');
+  t.className='toast'+(isErr==true?' err':isErr==='ok'?' ok':'');
+  t.textContent=msg;
   document.body.appendChild(t); _tt=setTimeout(()=>t.remove(),3200);
 }
 
