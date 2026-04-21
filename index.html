@@ -773,7 +773,7 @@ function renderDeployments() {
       <div class="tasks-body${d.open?' open':''}" id="tb-${d.id}">
         ${d.tasks.length?'<div class="tasks-header-label"><span>// tareas de soporte</span></div>':''}
         ${tasksHtml}
-        ${isDev?`<button class="add-task-row" onclick="openNewTask('${d.id}')">＋ agregar tarea</button>`:''}
+        ${canEditDep?`<button class="add-task-row" onclick="openNewTask('${d.id}')">＋ agregar tarea</button>`:''}
         ${archivosHtml}
       </div>
     </div>`;
@@ -785,12 +785,12 @@ function renderDeployments() {
 // ════════════════════════════════════
 function renderArchivos(d) {
   const archivos = d.archivos || [];
-  const storageReady = !!(SB_URL && SB_KEY) && session?.rol === 'desarrollador';
+  const storageReady = !!(SB_URL && SB_KEY) && session?.rol === 'desarrollador' && d.creado_por === session?.id;
 
   const filesHtml = archivos.length
     ? archivos.map(a => {
         const ts = new Date(a.created_at).toLocaleDateString('es-CO',{timeZone:'America/Bogota',day:'2-digit',month:'short'});
-        const canDelete = session && a.subido_por === session.id;
+        const canDelete = session?.rol === 'desarrollador' && a.subido_por === session.id;
         return `<div class="file-item">
           <span class="file-icon">${fileIcon(a.nombre)}</span>
           <span class="file-name" title="${esc(a.nombre)}">${esc(a.nombre)}</span>
