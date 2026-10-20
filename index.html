@@ -294,7 +294,7 @@ body { font-family:var(--font); background:var(--bg-0); color:var(--text-1); min
 
   <div id="viewHistorial" style="display:none">
     <div class="hist-info-bar">
-      <span class="hist-info-text">Mostrando últimos 50 registros · <span>se eliminan automáticamente después de 60 días</span></span>
+      <span class="hist-info-text">Mostrando últimos 50 registros del último mes · <span>se eliminan automáticamente después de 30 días</span></span>
       <span class="hist-info-text" id="histCount" style="color:var(--text-2)"></span>
     </div>
     <div class="loading" id="loadingH" style="display:none">// cargando historial...</div>
@@ -624,19 +624,33 @@ function cerrarSesion() {
 }
 
 // ════════════════════════════════════
-// CARGAR DESPLIEGUES
+// CARGAR DESPLIEGUES — solo los de los últimos 2 meses (por fecha del despliegue)
 // ════════════════════════════════════
+const RELEASES_MESES = 2;
+
+function fechaLimiteReleases() {
+  const d = new Date();
+  d.setMonth(d.getMonth() - RELEASES_MESES);
+  return d.toLocaleDateString('en-CA',{timeZone:'America/Bogota'}); // YYYY-MM-DD
+}
+
 async function loadDeployments() {
   show('loadingD'); hide('emptyD');
   document.getElementById('depList').innerHTML = '';
   try {
-    const deps     = await api('despliegues?order=created_at.desc&select=*,dev:usuarios!despliegues_desarrollador_id_fkey(nombre),sup:usuarios!despliegues_soporte_id_fkey(nombre)');
-    const tasks    = await api('tareas?order=orden.asc,created_at.asc&select=*,cmp_u:usuarios!tareas_completada_por_fkey(nombre),del_u:usuarios!tareas_eliminada_por_fkey(nombre)');
-    const comments = await api('comentarios?order=created_at.asc&select=*,u:usuarios(nombre)');
-    // Cargar archivos de cada despliegue
-    let archivos = [];
-    try { archivos = await api('archivos_deploy?order=created_at.desc&select=*,u:usuarios(nombre)') || []; } catch(e){}
-    cache = (deps||[]).map(d=>({
+    const deps = await api(`despliegues?fecha=gte.${fechaLimiteReleases()}&order=created_at.desc&select=*,dev:usuarios!despliegues_desarrollador_id_fkey(nombre),sup:usuarios!despliegues_soporte_id_fkey(nombre)`) || [];
+    let tasks = [], comments = [], archivos = [];
+    if (deps.length) {
+      // Solo tareas, comentarios y archivos de los despliegues cargados, en paralelo
+      const ids = `in.(${deps.map(d=>d.id).join(',')})`;
+      [tasks, comments, archivos] = await Promise.all([
+        api(`tareas?despliegue_id=${ids}&order=orden.asc,created_at.asc&select=*,cmp_u:usuarios!tareas_completada_por_fkey(nombre),del_u:usuarios!tareas_eliminada_por_fkey(nombre)`),
+        api(`comentarios?t.despliegue_id=${ids}&order=created_at.asc&select=*,u:usuarios(nombre),t:tareas!inner(despliegue_id)`),
+        api(`archivos_deploy?despliegue_id=${ids}&order=created_at.desc&select=*,u:usuarios(nombre)`).catch(()=>[])
+      ]);
+    }
+    archivos = archivos || [];
+    cache = deps.map(d=>({
       ...d, open:false,
       tasks:(tasks||[]).filter(t=>t.despliegue_id===d.id).map(t=>({
         ...t, comments:(comments||[]).filter(c=>c.tarea_id===t.id)
@@ -1133,20 +1147,25 @@ async function saveComment() {
 }
 
 // ════════════════════════════════════
-// HISTORIAL — con limpieza de 60 días
+// HISTORIAL — último mes, con limpieza de 30 días
 // ════════════════════════════════════
 async function audit(entidad, id, accion, detalle) {
   // No guardar ingresos si el historial ya tiene muchos registros
   try { await api('historial',{method:'POST',prefer:'return=minimal',body:{entidad,entidad_id:id,accion,usuario_id:session?.id,detalle}}); } catch(e){}
 }
 
+const HISTORIAL_DIAS = 30;
+
+function fechaLimiteHistorial() {
+  const d = new Date();
+  d.setDate(d.getDate() - HISTORIAL_DIAS);
+  return d.toISOString();
+}
+
 async function limpiarHistorialAntiguo() {
-  // Eliminar registros con más de 60 días
+  // Eliminar registros con más de 30 días
   try {
-    const fechaLimite = new Date();
-    fechaLimite.setDate(fechaLimite.getDate() - 60);
-    const isoLimite = fechaLimite.toISOString();
-    await api(`historial?created_at=lt.${isoLimite}`, { method:'DELETE', prefer:'return=minimal' });
+    await api(`historial?created_at=lt.${fechaLimiteHistorial()}`, { method:'DELETE', prefer:'return=minimal' });
   } catch(e) {
     console.warn('No se pudo limpiar historial antiguo:', e.message);
   }
@@ -1157,11 +1176,11 @@ async function loadHistorial() {
   document.getElementById('histList').innerHTML='';
   document.getElementById('histCount').textContent='';
 
-  // Limpiar registros mayores a 60 días antes de cargar
+  // Limpiar registros mayores a 30 días antes de cargar
   await limpiarHistorialAntiguo();
 
   try {
-    const h = await api('historial?order=created_at.desc&limit=50&select=*,u:usuarios(nombre)');
+    const h = await api(`historial?created_at=gte.${fechaLimiteHistorial()}&order=created_at.desc&limit=50&select=*,u:usuarios(nombre)`);
     hide('loadingH');
 
     if (h?.length) {
